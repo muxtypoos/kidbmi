@@ -93,13 +93,22 @@ eq("band usual range", kid(16).band, "within the usual range (2nd to 91st centil
 eq("band overweight", kid(20).band, "overweight (\u226591st centile)");
 eq("band obese", kid(22).band, "obese (\u226598th centile)");
 eq("band severely obese", kid(26).band, "severely obese (\u226599.6th centile)");
+eq("band morbidly obese", kid(40).band, "morbidly obese (\u2265+3.33 SD)");
+eq("on the +3.33 SD line is morbidly obese", E.paediatric(CEN, { w: (E.cen(CEN, "M", "c333", 10) + 1e-6) * 1.96, hcm: 140, age: 10, male: true }).level, 4);
+eq("just under +3.33 SD is only severely obese", E.paediatric(CEN, { w: (E.cen(CEN, "M", "c333", 10) - 0.05) * 1.96, hcm: 140, age: 10, male: true }).level, 3);
+eq("+3.33 SD line above the 99.6th at every age", [..."MF"].every((s) => { for (let a = 2; a <= 20; a += 0.05) if (!(E.cen(CEN, s, "c333", a) > E.cen(CEN, s, "c996", a))) return false; return true; }), true);
+/* +3.33 SD checked against the printed RCPCH chart (girls and boys, age 20 and age 12): read by overlay on the PDF, then values at the exact data ages */
+eq("girls +3.33 SD at 20 y", E.cen(CEN, "F", "c333", 20), 38.5199, 5e-4);
+eq("boys +3.33 SD at 20 y", E.cen(CEN, "M", "c333", 20), 38.1679, 5e-4);
+eq("girls +3.33 SD at 12 y", E.cen(CEN, "F", "c333", 12), 34.025, 5e-4);
+eq("boys +3.33 SD at 12 y", E.cen(CEN, "M", "c333", 12), 33.3624, 5e-4);
 eq("levels -2 to 3", [kid(12).level, kid(13.3).level, kid(16).level, kid(20).level, kid(22).level, kid(26).level], [-2, -1, 0, 1, 2, 3]);
 eq("exactly on the 98th counts as obese", E.paediatric(CEN, { w: 21.7086 * 1.96, hcm: 140, age: 10, male: true }).level, 2);
 eq("exactly on the 2nd is not underweight", E.paediatric(CEN, { w: 13.6783 * 1.96, hcm: 140, age: 10, male: true }).level, 0);
 eq("just under the 2nd is underweight", E.paediatric(CEN, { w: 13.67 * 1.96, hcm: 140, age: 10, male: true }).level, -1);
 eq("exactly on the 0.4th is not very underweight", E.paediatric(CEN, { w: 13.0196 * 1.96, hcm: 140, age: 10, male: true }).level, -1);
 eq("just under the 0.4th is very underweight", E.paediatric(CEN, { w: 13.01 * 1.96, hcm: 140, age: 10, male: true }).level, -2);
-eq("all nine centile values returned", Object.keys(kid(16).cc), ["c04", "c2", "c9", "c25", "c50", "c75", "c91", "c98", "c996"]);
+eq("nine centile values and the +3.33 SD line returned", Object.keys(kid(16).cc), ["c04", "c2", "c9", "c25", "c50", "c75", "c91", "c98", "c996", "c333"]);
 eq("centile value returned", kid(16).cc.c98, 21.7086, 1e-9);
 
 /* nearest of the nine lines, boy 10 y */
@@ -110,6 +119,7 @@ eq("nearest: BMI 16.5 is the 50th, above", [nr(16.5).name, nr(16.5).diff > 0], [
 eq("nearest: BMI 18.5 is the 75th (above) or 91st", nr(18.7).name, "91st");
 eq("nearest: BMI 23 is the 98th, above", [nr(23).name, nr(23).diff > 0], ["98th", true]);
 eq("nearest: BMI 40 is the 99.6th", nr(40).name, "99.6th");
+eq("nearest line still chooses among the nine centiles only (BMI 60)", nr(60).name, "99.6th");
 eq("nearest value is that line's BMI", nr(16.5).value, 16.423, 1e-9);
 eq("nearest difference is BMI minus line", nr(16.5).diff, 16.5 - 16.423, 1e-6);
 eq("under 2 y not placed", E.paediatric(CEN, { w: 10, hcm: 80, age: 1.5, male: true }).ok, false);

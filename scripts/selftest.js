@@ -33,8 +33,16 @@ function indepCentile(sex, line, age) {
   const t = (age - seg[k][0]) / (seg[k + 1][0] - seg[k][0]);
   return seg[k][1] * (1 - t) + seg[k + 1][1] * t;
 }
-function indepBand(bmi, c) { return bmi >= c.c996 ? "severely obese" : bmi >= c.c98 ? "obese" : bmi >= c.c91 ? "overweight" : bmi < c.c04 ? "very underweight" : bmi < c.c2 ? "underweight" : "usual range"; }
-const bandShort = (b) => (/^severely obese/.test(b) ? "severely obese" : /^obese/.test(b) ? "obese" : /^overweight/.test(b) ? "overweight" : /^very underweight/.test(b) ? "very underweight" : /^underweight/.test(b) ? "underweight" : "usual range");
+/* +3.33 SD a different way from the data builder: fit L and S from the 2nd and 98th (z = -2, +2) with the 50th, instead of the 0.4th and 99.6th */
+function indepSD333(sex, age) {
+  const m = indepCentile(sex, "c50", age), lo = indepCentile(sex, "c2", age), hi = indepCentile(sex, "c98", age);
+  let a = -6, b = -0.05; const f = (L) => { const S = ((hi / m) ** L - 1) / (2 * L); return m * (1 - 2 * L * S) ** (1 / L) - lo; };
+  for (let i = 0; i < 200; i++) { const c = (a + b) / 2; if (f(a) * f(c) <= 0) b = c; else a = c; }
+  const L = (a + b) / 2, S = ((hi / m) ** L - 1) / (2 * L);
+  return m * (1 + L * S * (10 / 3)) ** (1 / L);
+}
+function indepBand(bmi, c) { return bmi >= c.c333 ? "morbidly obese" : bmi >= c.c996 ? "severely obese" : bmi >= c.c98 ? "obese" : bmi >= c.c91 ? "overweight" : bmi < c.c04 ? "very underweight" : bmi < c.c2 ? "underweight" : "usual range"; }
+const bandShort = (b) => (/^morbidly obese/.test(b) ? "morbidly obese" : /^severely obese/.test(b) ? "severely obese" : /^obese/.test(b) ? "obese" : /^overweight/.test(b) ? "overweight" : /^very underweight/.test(b) ? "very underweight" : /^underweight/.test(b) ? "underweight" : "usual range");
 const LINEDEFS = [["c04", "0.4th"], ["c2", "2nd"], ["c9", "9th"], ["c25", "25th"], ["c50", "50th"], ["c75", "75th"], ["c91", "91st"], ["c98", "98th"], ["c996", "99.6th"]];
 
 /* ---------- what the screen does with typed values ---------- */
@@ -45,7 +53,7 @@ const r2 = (v) => (Math.round(v * 100) / 100).toFixed(2);
 
 const HEAD = ["group", "row", "sex", "age_years", "weight_kg", "height_cm", "status",
   "BMI", "BMI_shown_in_app", "Peters_ECV_litres", "Peters_LBW_kg", "LBW_shown_in_app_kg", "LBW_percent_of_weight", "LBW_flag",
-  "RCPCH_0.4th", "RCPCH_2nd", "RCPCH_9th", "RCPCH_25th", "RCPCH_50th", "RCPCH_75th", "RCPCH_91st", "RCPCH_98th", "RCPCH_99.6th", "RCPCH_band", "nearest_line", "BMI_minus_nearest_line",
+  "RCPCH_0.4th", "RCPCH_2nd", "RCPCH_9th", "RCPCH_25th", "RCPCH_50th", "RCPCH_75th", "RCPCH_91st", "RCPCH_98th", "RCPCH_99.6th", "RCPCH_+3.33SD", "RCPCH_band", "nearest_line", "BMI_minus_nearest_line",
   "independent_BMI", "independent_LBW_kg", "independent_band", "independent_nearest_line", "check"];
 
 function row(group, n, sex, ageS, wS, hS) {
@@ -66,7 +74,7 @@ function row(group, n, sex, ageS, wS, hS) {
   o.Peters_ECV_litres = r2(ecv); o.Peters_LBW_kg = r2(L.value); o.LBW_shown_in_app_kg = f1(L.value);
   o.LBW_percent_of_weight = r2(100 * L.value / w);
   o.LBW_flag = L.implausible ? "IMPLAUSIBLE (under 25% of weight)" : L.capped ? "capped at total weight" : "";
-  if (P.ok) { LINEDEFS.forEach(([k, nm]) => { o["RCPCH_" + nm] = r2(P.cc[k]); }); o.RCPCH_band = P.band; o.nearest_line = P.nearest.name; o.BMI_minus_nearest_line = (P.nearest.diff >= 0 ? "+" : "") + r2(P.nearest.diff); }
+  if (P.ok) { LINEDEFS.forEach(([k, nm]) => { o["RCPCH_" + nm] = r2(P.cc[k]); }); o["RCPCH_+3.33SD"] = r2(P.cc.c333); o.RCPCH_band = P.band; o.nearest_line = P.nearest.name; o.BMI_minus_nearest_line = (P.nearest.diff >= 0 ? "+" : "") + r2(P.nearest.diff); }
   else o.RCPCH_band = "not on chart: " + P.reason;
 
   /* independent check */
@@ -75,11 +83,11 @@ function row(group, n, sex, ageS, wS, hS) {
   o.independent_BMI = r2(ibmi); o.independent_LBW_kg = r2(iLbw);
   let ok = Math.abs(ibmi - bmi) < 1e-9 && Math.abs(iLbw - L.value) < 1e-9 && Math.abs(indepECV(w, hcm) - ecv) < 1e-9 && iImpl === L.implausible && iCap === L.capped;
   if (P.ok) {
-    const ic = {}; LINEDEFS.forEach(([k]) => { ic[k] = indepCentile(sx, k, age); });
+    const ic = {}; LINEDEFS.forEach(([k]) => { ic[k] = indepCentile(sx, k, age); }); ic.c333 = indepSD333(sx, age);
     o.independent_band = indepBand(ibmi, ic);
     const cand = LINEDEFS.map(([k, nm]) => [nm, ic[k]]).sort((p, q) => Math.abs(ibmi - p[1]) - Math.abs(ibmi - q[1]) || p[1] - q[1]);
     o.independent_nearest_line = cand[0][0];
-    ok = ok && o.independent_nearest_line === P.nearest.name && o.independent_band === bandShort(P.band) && LINEDEFS.every(([k]) => Math.abs(ic[k] - P.cc[k]) < 1e-9);
+    ok = ok && Math.abs(ic.c333 - P.cc.c333) < 0.01 && o.independent_nearest_line === P.nearest.name && o.independent_band === bandShort(P.band) && LINEDEFS.every(([k]) => Math.abs(ic[k] - P.cc[k]) < 1e-9);
   } else {
     o.independent_band = (age < 2 || age > 20) ? "not on chart" : "";
     ok = ok && (age < 2 || age > 20);

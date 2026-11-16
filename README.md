@@ -4,7 +4,7 @@ Standalone calculator for children: BMI, lean body weight and extracellular flui
 
 - `src/engine.js`: all equations and rules. No screen code, no global state; audit and test it on its own.
 - `src/template.html`: the UI. It only reads inputs, calls `KidBMI.*` and displays results.
-- `src/data/rcpch-bmi-centiles.json`: the nine RCPCH BMI centile lines, 0.4th to 99.6th (source and licence note in `src/data/README.md`).
+- `src/data/rcpch-bmi-centiles.json`: the nine RCPCH BMI centile lines, 0.4th to 99.6th, plus the +3.33 SD line used for "morbidly obese" (source and licence note in `src/data/README.md`).
 - `scripts/build.js`: inlines engine and data into one offline file, `dist/index.html` (usable as a Capacitor web dir).
 - `tests/engine.js`: hand-checked worked examples. `tests/equivalence.js`: compares against the Admix engine (set `ADMIX_ENGINE=/path/to/admix/src/engine.js`). `tests/ui.js`: types values into the built page in a headless browser (needs Playwright; `CHROME=/path/to/chrome` if Chrome is not at /usr/bin/google-chrome).
 

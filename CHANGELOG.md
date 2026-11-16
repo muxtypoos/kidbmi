@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.0
+- **Morbidly obese** is now detected and shown: BMI at or above the RCPCH chart's +3.33 SD line (the chart prints "Morbidly obese" just above that line). The box shows the +3.33 SD value at the child's age. Severely obese remains 99.6th centile up to the +3.33 SD line. The +3.33 SD value is also in the centile list, the working, the copied summary and selftest.csv. It is not drawn on the ruler.
+- The +3.33 SD line is not one of the nine published centile lines, so `scripts/make_centile_data.py` computes it from the RCPCH curves (Cole LMS form, fitted from the 0.4th, 50th and 99.6th lines; the nine lines refit to within 0.0005 BMI). It was checked by overlay on the printed RCPCH girls' and boys' charts, and selftest.csv re-derives it a second way (from the 2nd, 50th and 98th lines) and checks agreement within 0.01.
+
 ## 0.2.0 (review fixes)
 - **Age** is now entered as years, months and days (months matter: about 1 in 10 test cases changed band within a year of age). Required.
 - **Rounding:** BMI, centile values and differences round to the nearest 0.1 (before they rounded down, which could show a BMI equal to a line it was above). Lean weight and ages still round down. Total weight is shown as entered.

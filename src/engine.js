@@ -94,11 +94,13 @@ var KidBMI = (function () {
     { k: "c75", name: "75th" }, { k: "c91", name: "91st" }, { k: "c98", name: "98th" }, { k: "c996", name: "99.6th" }
   ];
 
-  /* Bands and their level: -2 very underweight, -1 underweight, 0 usual range, 1 overweight, 2 obese, 3 severely obese.
+  /* Bands and their level: -2 very underweight, -1 underweight, 0 usual range, 1 overweight, 2 obese, 3 severely obese,
+     4 morbidly obese (at or above the chart's +3.33 SD line: the RCPCH chart prints "Morbidly obese" just above that line).
      Cut-offs follow the RCPCH BMI chart notes: above 91st overweight, 98th very overweight (clinically obese),
      99.6th severely obese; below the 2nd centile unusual (may reflect undernutrition or a small build); below the 0.4th
      further assessment advised. */
   var BANDS = [
+    { level: 4, label: "morbidly obese (\u2265+3.33 SD)" },
     { level: 3, label: "severely obese (\u226599.6th centile)" },
     { level: 2, label: "obese (\u226598th centile)" },
     { level: 1, label: "overweight (\u226591st centile)" },
@@ -122,7 +124,8 @@ var KidBMI = (function () {
       /* nearest line by BMI difference; a tie goes to the lower line */
       if (!nearest || Math.abs(d) < Math.abs(nearest.diff) - 1e-12) nearest = { k: l.k, name: l.name, value: c[l.k], diff: d };
     });
-    var level = b >= c.c996 ? 3 : b >= c.c98 ? 2 : b >= c.c91 ? 1 : b < c.c04 ? -2 : b < c.c2 ? -1 : 0;
+    c.c333 = cen(CEN, sx, "c333", a); /* the +3.33 SD line: not one of the nine centiles, so not used for the nearest line */
+    var level = b >= c.c333 ? 4 : b >= c.c996 ? 3 : b >= c.c98 ? 2 : b >= c.c91 ? 1 : b < c.c04 ? -2 : b < c.c2 ? -1 : 0;
     return { ok: true, bmi: b, age: a, sex: sx, cc: c, band: bandFor(level), level: level, above91: b >= c.c91, nearest: nearest, nearSwitch: Math.abs(a - 4) < 0.5 };
   }
 

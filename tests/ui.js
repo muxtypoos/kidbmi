@@ -77,6 +77,17 @@ const ok = (name, cond, extra) => { if (cond) pass++; else { fail++; console.log
   await enter(pg, 30, 170, 15, null, null);
   ok("capped lean weight says so", /capped at total weight/.test(await txt(pg, ".hero")));
 
+  /* morbidly obese: at or above the +3.33 SD line */
+  await enter(pg, 80, 130, 10, null, null, "M");
+  ok("morbidly obese shown (BMI 47, boy 10 y)", /morbidly obese/i.test(await txt(pg, ".bmibox")), await txt(pg, ".bmibox"));
+  ok("morbidly obese box states the +3.33 SD value", /\+3\.33 SD line \(morbidly obese from here up\) is 30\.0 kg/.test(await txt(pg, ".bmibox")), await txt(pg, ".bmibox"));
+  await enter(pg, 47, 130, 10, null, null, "M");
+  ok("severely obese (not morbid) between 99.6th and +3.33 SD (BMI 27.8, boy 10 y)", /severely obese/i.test(await txt(pg, ".bmibox")) && !/^morbidly/i.test(await txt(pg, ".bmibox .bd")), await txt(pg, ".bmibox .bd"));
+  await pg.screenshot({ path: "/tmp/ui-sev.png" });
+  await enter(pg, 80, 130, 10, null, null, "M");
+  await pg.screenshot({ path: "/tmp/ui-morbid.png" });
+  ok("working lists the +3.33 SD value", /\+3\.33 SD = /.test(await pg.evaluate(() => document.getElementById("wkb").textContent)));
+
   /* chart enlarge */
   await enter(pg, 45, 140, 10, null, null, "M");
   await pg.click("#chartw");

@@ -46,7 +46,7 @@ for (const male of [true, false]) for (let a = 2; a <= 20; a += 0.9) for (let b 
   const P = Ad.patient({ w, h: hm, age: a, male, PM: true, WM: "auto", S: { lbw: "jan", lbwP: "peters", pc: "c98", bmi: 30, blend: true, hold: false }, CEN: ADCEN });
   const r = An.paediatric(CEN, { w, hcm: hm * 100, age: a, male });
   /* wording differs slightly (KidBMI adds "centile"), so compare the category */
-  const cat = (t) => /^severely obese/.test(t) ? 3 : /^obese/.test(t) ? 2 : /^overweight/.test(t) ? 1 : 0;
+  const cat = (t) => /^(severely|morbidly) obese/.test(t) ? 3 : /^obese/.test(t) ? 2 : /^overweight/.test(t) ? 1 : 0;
   const nearEdge = ["c91", "c98", "c996"].some((k) => Math.abs(r.bmi - r.cc[k]) < 0.06);
   n++; if (!nearEdge && cat(P.band) !== cat(r.band)) { bad++; if (bad < 15) console.log("DIFF band", male, a, b, P.band, r.band); }
 }

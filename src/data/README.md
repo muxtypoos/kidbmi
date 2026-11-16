@@ -10,3 +10,5 @@ That repository is published under the GNU Affero General Public License v3.0. C
 Earlier versions used the 91st, 98th and 99.6th lines digitised from the RCPCH chart images (as in Admix). Those agree with the exact values to within 0.06 BMI units.
 
 `rcpch-chart-calibration.json` places the chart images' axes (age 2 and 20, BMI 50 and 8) so the marker can be drawn on them.
+
+`c333` is the +3.33 SD line (not in the RCPCH nine-centile files): computed by `scripts/make_centile_data.py` from the 0.4th, 50th and 99.6th lines using the LMS form of the curves, and checked against the printed RCPCH chart (boys and girls, 2 to 20 years).

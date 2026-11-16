@@ -47,7 +47,7 @@ summary{cursor:pointer;font-weight:600;min-height:32px}
 .bmibox{border:1px solid var(--bd);border-radius:12px;padding:12px 14px;background:var(--bg);margin-bottom:10px}
 .bmibox .k{font-size:13px;color:var(--mu)}.bmibox .bv{font-size:38px;font-weight:800;line-height:1.05;letter-spacing:-.02em}.bmibox .bv small{font-size:16px;font-weight:500;color:var(--mu);letter-spacing:0}
 .bmibox .bd{font-size:16px;font-weight:700;margin-top:2px}.bmibox .bn{font-size:14px;margin:8px 0 2px}
-.bmibox.lvm1 .bd,.bmibox.lvm2 .bd{color:var(--lowt)}.bmibox .bh{font-size:13px;color:var(--mu);margin:2px 0 0}.bmibox.lv0 .bd{color:var(--okt)}.bmibox.lv1 .bd{color:var(--wat)}.bmibox.lv2 .bd,.bmibox.lv3 .bd{color:var(--ert)}
+.bmibox.lvm1 .bd,.bmibox.lvm2 .bd{color:var(--lowt)}.bmibox .bh{font-size:13px;color:var(--mu);margin:2px 0 0}.bmibox.lv0 .bd{color:var(--okt)}.bmibox.lv1 .bd{color:var(--wat)}.bmibox.lv2 .bd,.bmibox.lv3 .bd{color:var(--ert)}.bmibox.lv4 .bd{color:var(--ert);text-transform:uppercase;letter-spacing:.02em}.bmibox.lv4{border-color:var(--ert);border-width:2px}
 .bmibox svg{width:100%;height:auto;display:block;margin-top:4px}.bmibox svg text{fill:var(--mu);font-size:12px;font-family:inherit}
 @media (max-width:420px){.big .v{font-size:26px}.bmibox .bv{font-size:34px}}
 #chartw{cursor:zoom-in}
@@ -115,6 +115,7 @@ main{max-width:none;padding:0;display:grid;grid-template-columns:1.1fr 1fr;gap:6
 <details><summary>Formulas</summary><div id="fml"></div></details>
 <details><summary>About and disclaimer</summary>
 <p>KidBMI calculates body mass index, estimates lean body weight with the Peters formula (derived in children), and places children aged 2 to 20 years on the RCPCH BMI centile chart. It is decision support only. It does not replace clinical judgement or local policy. Check any value that will be used for dosing against your own guideline.</p>
+<p><b>Morbidly obese:</b> the RCPCH chart prints "Morbidly obese" just above its +3.33 SD line, so KidBMI reports it when the BMI is at or above that line. The +3.33 SD line is not among the nine published centile lines; KidBMI calculates it from the same RCPCH reference curves (their LMS form), and it agrees with the printed chart.</p>
 <p><b>Safeguards:</b> if Peters gives a lean weight under 25% of total weight (or no valid number), it is marked implausible (shown in red) and should not be relied on. Lean weight is never shown above total weight or below zero.</p>
 <p class="mu" id="ver"></p></details>
 </section>
@@ -177,7 +178,7 @@ function bmiBox(b,r,i){
   var sx=r.sex==="M"?"boys":"girls",nl=r.nearest,ad=Math.abs(nl.diff),dir=ad<0.05?"on the "+nl.name+" line":n(A.rd(ad,1))+(nl.diff>0?" above":" below")+" the "+nl.name+" line";
   return'<div class="bmibox lv'+(r.level<0?"m"+(-r.level):r.level)+'"><div class="k">BMI at '+n(fl(r.age,1))+' years ('+sx+')</div><div class="bv">'+num+' <small>kg/m²</small></div>'+
     '<div class="bd">'+esc(r.band)+'</div>'+(r.level===-1?'<div class="bh">Below the 2nd centile is unusual and may reflect undernutrition or a small build (RCPCH).</div>':r.level===-2?'<div class="bh">Below the 0.4th centile: the RCPCH advises further assessment.</div>':'')+
-    '<div class="bn">Nearest centile line: <b>'+nl.name+'</b> ('+n(A.rd(nl.value,1))+' kg/m²), BMI is <b>'+dir+'</b></div>'+(r.nearSwitch?'<div class="bh">Around 4 years the RCPCH reference changes from UK-WHO to UK90, so the centile lines step slightly and a child can change band across the 4th birthday.</div>':'')+ruler(r)+'<div class="bh" style="margin-top:2px">Colours are for orientation. The band follows the RCPCH thresholds: 2nd, 91st, 98th and 99.6th centile.</div></div>'}
+    (r.level>=3?'<div class="bh">'+(r.level===4?'The +3.33 SD line (morbidly obese from here up) is <b>':'The +3.33 SD line, from which the RCPCH chart marks "morbidly obese", is <b>')+n(A.rd(r.cc.c333,1))+' kg/m²</b> at this age.</div>':'')+'<div class="bn">Nearest centile line: <b>'+nl.name+'</b> ('+n(A.rd(nl.value,1))+' kg/m²), BMI is <b>'+dir+'</b></div>'+(r.nearSwitch?'<div class="bh">Around 4 years the RCPCH reference changes from UK-WHO to UK90, so the centile lines step slightly and a child can change band across the 4th birthday.</div>':'')+ruler(r)+'<div class="bh" style="margin-top:2px">Colours are for orientation. The band follows the RCPCH thresholds: 2nd, 91st, 98th and 99.6th centile, and +3.33 SD for morbidly obese.</div></div>'}
 
 /* Horizontal ruler: the nine RCPCH centile lines at this age, evenly spaced, and a triangle marking the patient's BMI on the line.
    Tag text is small. Tags are small and in one row, and the BMI label stays inside the picture. */
@@ -203,7 +204,7 @@ function paed(r){
   $("pc").style.display=r.ok?"":"none";
   if(!r.ok)return;
   var sx=r.sex==="M"?"boys":"girls";
-  $("pcb").innerHTML='<p class="mu" style="margin:0 0 4px">Centile lines at '+n(fl(r.age,1))+' years ('+sx+'), kg/m²: '+[["c04","0.4th"],["c2","2nd"],["c9","9th"],["c25","25th"],["c50","50th"],["c75","75th"],["c91","91st"],["c98","98th"],["c996","99.6th"]].map(function(l){return l[1]+' <b style="color:var(--tx)">'+n(A.rd(r.cc[l[0]],1))+'</b>'}).join(' · ')+'</p>';
+  $("pcb").innerHTML='<p class="mu" style="margin:0 0 4px">Centile lines at '+n(fl(r.age,1))+' years ('+sx+'), kg/m²: '+[["c04","0.4th"],["c2","2nd"],["c9","9th"],["c25","25th"],["c50","50th"],["c75","75th"],["c91","91st"],["c98","98th"],["c996","99.6th"],["c333","+3.33 SD"]].map(function(l){return l[1]+' <b style="color:var(--tx)">'+n(A.rd(r.cc[l[0]],1))+'</b>'}).join(' · ')+'</p>';
   chart(r);
 }
 
@@ -228,14 +229,14 @@ function working(i,L,b,ecv){
   else s+='<p>Lean weight is never shown above total weight or below zero'+(L.capped?' (here it was cut back to total weight)':'')+'. <b>Shown: '+n(L.value,2)+' kg ('+n(fl(L.value,1))+' kg rounded down).</b></p>';
   s+='<p><b>3. Peters extracellular fluid volume</b></p><div class="f">ECV = 0.0215 × W^0.6469 × H^0.7236\n    = 0.0215 × '+n(Math.pow(W,0.6469),3)+' × '+n(Math.pow(H,0.7236),3)+' = '+n(ecv,3)+' L\nPeters LBW = 3.8 × ECV = '+n(3.8*ecv,2)+' kg</div>';
   if(i.age>0&&i.age<=20){var r=A.paediatric(CEN,{w:W,hcm:H,age:i.age,male:male});
-    s+='<p><b>4. RCPCH centiles</b></p><div class="f">'+(r.ok?'Age '+n(r.age,3)+' y, '+(male?'boy':'girl')+'\n0.4th = '+n(r.cc.c04,2)+', 2nd = '+n(r.cc.c2,2)+', 9th = '+n(r.cc.c9,2)+', 25th = '+n(r.cc.c25,2)+', 50th = '+n(r.cc.c50,2)+'\n75th = '+n(r.cc.c75,2)+', 91st = '+n(r.cc.c91,2)+', 98th = '+n(r.cc.c98,2)+', 99.6th = '+n(r.cc.c996,2)+' kg/m²\nBMI '+n(b,2)+' kg/m² is '+r.band+'\nNearest line: '+r.nearest.name+' ('+n(r.nearest.value,2)+'), difference '+(r.nearest.diff>=0?'+':'')+n(r.nearest.diff,2):esc(r.reason))+'</div>'+(r.ok?'<p class="mu">Each line is interpolated linearly between the RCPCH reference points at the child\'s age.</p>':'')}
+    s+='<p><b>4. RCPCH centiles</b></p><div class="f">'+(r.ok?'Age '+n(r.age,3)+' y, '+(male?'boy':'girl')+'\n0.4th = '+n(r.cc.c04,2)+', 2nd = '+n(r.cc.c2,2)+', 9th = '+n(r.cc.c9,2)+', 25th = '+n(r.cc.c25,2)+', 50th = '+n(r.cc.c50,2)+'\n75th = '+n(r.cc.c75,2)+', 91st = '+n(r.cc.c91,2)+', 98th = '+n(r.cc.c98,2)+', 99.6th = '+n(r.cc.c996,2)+', +3.33 SD = '+n(r.cc.c333,2)+' kg/m²\nBMI '+n(b,2)+' kg/m² is '+r.band+'\nNearest line: '+r.nearest.name+' ('+n(r.nearest.value,2)+'), difference '+(r.nearest.diff>=0?'+':'')+n(r.nearest.diff,2):esc(r.reason))+'</div>'+(r.ok?'<p class="mu">Each line is interpolated linearly between the RCPCH reference points at the child\'s age.</p>':'')}
   $("wkb").innerHTML=s;$("wkb").className="";
 }
 
 function summary(){
   if(!last||!last.ready)return"";
   var i=last.i,b=A.bmi(i.w,i.hcm),L=A.lbw(i.w,i.hcm),t="KIDBMI SUMMARY\n"+(i.male?"Male":"Female")+", weight "+i.w+" kg, height "+i.hcm+" cm"+", age "+fl(i.age,1)+" y"+"\nBMI "+n(A.rd(b,1))+" kg/m²\nLean body weight "+n(fl(L.value,1))+" kg ("+'Peters'+(L.implausible?", IMPLAUSIBLE":"")+")\nPeters ECV "+n(A.petersECV(i.w,i.hcm),2)+" L";
-  if(i.age>0&&i.age<=20){var r=A.paediatric(CEN,{w:i.w,hcm:i.hcm,age:i.age,male:i.male});if(r.ok)t+="\nRCPCH: BMI "+n(A.rd(r.bmi,1))+" is "+r.band+" (0.4th "+n(A.rd(r.cc.c04,1))+", 2nd "+n(A.rd(r.cc.c2,1))+", 50th "+n(A.rd(r.cc.c50,1))+", 91st "+n(A.rd(r.cc.c91,1))+", 98th "+n(A.rd(r.cc.c98,1))+", 99.6th "+n(A.rd(r.cc.c996,1))+"); nearest line "+r.nearest.name}
+  if(i.age>0&&i.age<=20){var r=A.paediatric(CEN,{w:i.w,hcm:i.hcm,age:i.age,male:i.male});if(r.ok)t+="\nRCPCH: BMI "+n(A.rd(r.bmi,1))+" is "+r.band+" (0.4th "+n(A.rd(r.cc.c04,1))+", 2nd "+n(A.rd(r.cc.c2,1))+", 50th "+n(A.rd(r.cc.c50,1))+", 91st "+n(A.rd(r.cc.c91,1))+", 98th "+n(A.rd(r.cc.c98,1))+", 99.6th "+n(A.rd(r.cc.c996,1))+", +3.33 SD "+n(A.rd(r.cc.c333,1))+"); nearest line "+r.nearest.name}
   return t+"\nKidBMI v"+VERSION+". Decision support only."}
 
 ["w","h","agey","agem","aged"].forEach(function(id){$(id).addEventListener("input",render)});
