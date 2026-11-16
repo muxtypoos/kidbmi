@@ -111,6 +111,16 @@ eq("band obese", kid(22).band, "obese (≥98th centile)");
 eq("band severely obese", kid(26).band, "severely obese (≥99.6th centile)");
 eq("exactly on 98th counts as obese", E.paediatric(CEN, { w: 21.7 * 1.96, hcm: 140, age: 9.98, male: true }).band, "obese (≥98th centile)");
 eq("centile values returned", kid(18).cc.c98, 21.7, 1e-9);
+/* nearest centile line: boy 9.98 y, lines 19.44 / 21.7 / 24.92 */
+eq("nearest: BMI 18 is nearest 91st, below", [kid(18).nearest.name, kid(18).nearest.diff < 0], ["91st", true]);
+eq("nearest: BMI 20 is nearest 91st, above", [kid(20).nearest.name, kid(20).nearest.diff > 0], ["91st", true]);
+eq("nearest: BMI 21 is nearest 98th", kid(21).nearest.name, "98th");
+eq("nearest: BMI 23 is nearest 98th (above)", [kid(23).nearest.name, kid(23).nearest.diff > 0], ["98th", true]);
+eq("nearest: BMI 24 is nearest 99.6th (below)", [kid(24).nearest.name, kid(24).nearest.diff < 0], ["99.6th", true]);
+eq("nearest: BMI 40 is nearest 99.6th", kid(40).nearest.name, "99.6th");
+eq("nearest value is that line's BMI", kid(21).nearest.value, 21.7, 1e-9);
+eq("nearest difference is signed BMI minus line", kid(23).nearest.diff, 23.0000000001 - 21.7, 1e-6);
+eq("levels 0 to 3", [kid(18).level, kid(20).level, kid(22).level, kid(26).level], [0, 1, 2, 3]);
 eq("under 2 y not placed", E.paediatric(CEN, { w: 10, hcm: 80, age: 1.5, male: true }).ok, false);
 eq("over 20 y not placed", E.paediatric(CEN, { w: 70, hcm: 175, age: 25, male: true }).ok, false);
 eq("no age not placed", E.paediatric(CEN, { w: 30, hcm: 130, age: 0, male: true }).ok, false);

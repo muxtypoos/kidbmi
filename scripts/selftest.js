@@ -43,8 +43,8 @@ const r2 = (v) => (Math.round(v * 100) / 100).toFixed(2);
 
 const HEAD = ["group", "row", "sex", "age_years", "weight_kg", "height_cm", "status",
   "BMI", "BMI_shown_in_app", "Peters_ECV_litres", "Peters_LBW_kg", "LBW_shown_in_app_kg", "LBW_percent_of_weight", "LBW_flag",
-  "RCPCH_91st", "RCPCH_98th", "RCPCH_99.6th", "RCPCH_band",
-  "independent_BMI", "independent_LBW_kg", "independent_band", "check"];
+  "RCPCH_91st", "RCPCH_98th", "RCPCH_99.6th", "RCPCH_band", "nearest_line", "BMI_minus_nearest_line",
+  "independent_BMI", "independent_LBW_kg", "independent_band", "independent_nearest_line", "check"];
 
 function row(group, n, sex, ageS, wS, hS) {
   const male = sex === "M", age = typed(ageS), w = typed(wS), hcm = typed(hS);
@@ -64,7 +64,7 @@ function row(group, n, sex, ageS, wS, hS) {
   o.Peters_ECV_litres = r2(ecv); o.Peters_LBW_kg = r2(L.value); o.LBW_shown_in_app_kg = f1(L.value);
   o.LBW_percent_of_weight = r2(100 * L.value / w);
   o.LBW_flag = L.implausible ? "IMPLAUSIBLE (under 25% of weight)" : L.capped ? "capped at total weight" : "";
-  if (P.ok) { o.RCPCH_91st = r2(P.cc.c91); o.RCPCH_98th = r2(P.cc.c98); o["RCPCH_99.6th"] = r2(P.cc.c996); o.RCPCH_band = P.band; }
+  if (P.ok) { o.RCPCH_91st = r2(P.cc.c91); o.RCPCH_98th = r2(P.cc.c98); o["RCPCH_99.6th"] = r2(P.cc.c996); o.RCPCH_band = P.band; o.nearest_line = P.nearest.name; o.BMI_minus_nearest_line = (P.nearest.diff >= 0 ? "+" : "") + r2(P.nearest.diff); }
   else o.RCPCH_band = "not on chart: " + P.reason;
 
   /* independent check */
@@ -75,7 +75,9 @@ function row(group, n, sex, ageS, wS, hS) {
   if (P.ok) {
     const ic = { c91: indepCentile(sx, "c91", age), c98: indepCentile(sx, "c98", age), c996: indepCentile(sx, "c996", age) };
     o.independent_band = indepBand(ibmi, ic);
-    ok = ok && o.independent_band === bandShort(P.band) && ["c91", "c98", "c996"].every((k) => Math.abs(ic[k] - P.cc[k]) < 1e-9);
+    const cand = [["91st", ic.c91], ["98th", ic.c98], ["99.6th", ic.c996]].sort((p, q) => Math.abs(ibmi - p[1]) - Math.abs(ibmi - q[1]) || p[1] - q[1]);
+    o.independent_nearest_line = cand[0][0];
+    ok = ok && o.independent_nearest_line === P.nearest.name && o.independent_band === bandShort(P.band) && ["c91", "c98", "c996"].every((k) => Math.abs(ic[k] - P.cc[k]) < 1e-9);
   } else {
     o.independent_band = (age < 2 || age > 20) ? "not on chart" : "";
     ok = ok && (age < 2 || age > 20);

@@ -116,6 +116,7 @@ var KidBMI = (function () {
     }
   }
 
+  var LINES = [{ k: "c91", name: "91st" }, { k: "c98", name: "98th" }, { k: "c996", name: "99.6th" }];
   var BANDS = [
     { k: "c996", label: "severely obese (≥99.6th centile)" },
     { k: "c98", label: "obese (≥98th centile)" },
@@ -132,7 +133,14 @@ var KidBMI = (function () {
     var c = { c91: cen(CEN, sx, "c91", a), c98: cen(CEN, sx, "c98", a), c996: cen(CEN, sx, "c996", a) };
     var band = "below the 91st centile";
     for (var j = 0; j < BANDS.length; j++) if (b >= c[BANDS[j].k]) { band = BANDS[j].label; break; }
-    return { ok: true, bmi: b, age: a, sex: sx, cc: c, band: band, above91: b >= c.c91 };
+    /* nearest of the three lines (by BMI difference; a tie goes to the lower line) and how many lines the BMI has reached (0 to 3) */
+    var nearest = null, level = 0;
+    LINES.forEach(function (l) {
+      var d = b - c[l.k];
+      if (d >= 0) level++;
+      if (!nearest || Math.abs(d) < Math.abs(nearest.diff) - 1e-12) nearest = { k: l.k, name: l.name, value: c[l.k], diff: d };
+    });
+    return { ok: true, bmi: b, age: a, sex: sx, cc: c, band: band, above91: b >= c.c91, nearest: nearest, level: level };
   }
 
   /* ---------- 5. Input plausibility ---------- */
