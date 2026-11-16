@@ -116,12 +116,25 @@ var KidBMI = (function () {
     }
   }
 
-  var LINES = [{ k: "c91", name: "91st" }, { k: "c98", name: "98th" }, { k: "c996", name: "99.6th" }];
-  var BANDS = [
-    { k: "c996", label: "severely obese (≥99.6th centile)" },
-    { k: "c98", label: "obese (≥98th centile)" },
-    { k: "c91", label: "overweight (≥91st centile)" }
+  /* The nine RCPCH centile lines, lowest first */
+  var LINES = [
+    { k: "c04", name: "0.4th" }, { k: "c2", name: "2nd" }, { k: "c9", name: "9th" }, { k: "c25", name: "25th" }, { k: "c50", name: "50th" },
+    { k: "c75", name: "75th" }, { k: "c91", name: "91st" }, { k: "c98", name: "98th" }, { k: "c996", name: "99.6th" }
   ];
+
+  /* Bands and their level: -2 very underweight, -1 underweight, 0 usual range, 1 overweight, 2 obese, 3 severely obese.
+     Cut-offs follow the RCPCH BMI chart notes: above 91st overweight, 98th very overweight (clinically obese),
+     99.6th severely obese; below the 2nd centile unusual (may reflect undernutrition or a small build); below the 0.4th
+     further assessment advised. */
+  var BANDS = [
+    { level: 3, label: "severely obese (\u226599.6th centile)" },
+    { level: 2, label: "obese (\u226598th centile)" },
+    { level: 1, label: "overweight (\u226591st centile)" },
+    { level: 0, label: "within the usual range (2nd to 91st centile)" },
+    { level: -1, label: "underweight (below the 2nd centile)" },
+    { level: -2, label: "very underweight (below the 0.4th centile)" }
+  ];
+  function bandFor(level) { return BANDS.filter(function (b) { return b.level === level; })[0].label; }
 
   /* Place a child on the RCPCH chart. i = {w kg, hcm, age years, male}. The chart covers 2 to 20 years. */
   function paediatric(CEN, i) {
@@ -130,17 +143,15 @@ var KidBMI = (function () {
     if (!(a > 0)) return { ok: false, reason: "Enter age to place the child on the RCPCH chart." };
     if (a < 2) return { ok: false, reason: "The RCPCH BMI chart starts at 2 years, so this child cannot be placed on it." };
     if (a > 20) return { ok: false, reason: "The RCPCH BMI chart ends at 20 years." };
-    var c = { c91: cen(CEN, sx, "c91", a), c98: cen(CEN, sx, "c98", a), c996: cen(CEN, sx, "c996", a) };
-    var band = "below the 91st centile";
-    for (var j = 0; j < BANDS.length; j++) if (b >= c[BANDS[j].k]) { band = BANDS[j].label; break; }
-    /* nearest of the three lines (by BMI difference; a tie goes to the lower line) and how many lines the BMI has reached (0 to 3) */
-    var nearest = null, level = 0;
+    var c = {}, nearest = null;
     LINES.forEach(function (l) {
+      c[l.k] = cen(CEN, sx, l.k, a);
       var d = b - c[l.k];
-      if (d >= 0) level++;
+      /* nearest line by BMI difference; a tie goes to the lower line */
       if (!nearest || Math.abs(d) < Math.abs(nearest.diff) - 1e-12) nearest = { k: l.k, name: l.name, value: c[l.k], diff: d };
     });
-    return { ok: true, bmi: b, age: a, sex: sx, cc: c, band: band, above91: b >= c.c91, nearest: nearest, level: level };
+    var level = b >= c.c996 ? 3 : b >= c.c98 ? 2 : b >= c.c91 ? 1 : b < c.c04 ? -2 : b < c.c2 ? -1 : 0;
+    return { ok: true, bmi: b, age: a, sex: sx, cc: c, band: bandFor(level), level: level, above91: b >= c.c91, nearest: nearest };
   }
 
   /* ---------- 5. Input plausibility ---------- */
@@ -166,7 +177,7 @@ var KidBMI = (function () {
     fl: fl, FORMULAS: FORMULAS, IDS: IDS,
     bmi: bmi, ageYears: ageYears,
     petersECV: petersECV, lbwRaw: lbwRaw, lbw: lbw, lbwAll: lbwAll, suggestFormula: suggestFormula,
-    cen: cen, paediatric: paediatric, BANDS: BANDS,
+    cen: cen, paediatric: paediatric, BANDS: BANDS, LINES: LINES,
     checks: checks
   };
 })();

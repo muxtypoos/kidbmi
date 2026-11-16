@@ -1,10 +1,10 @@
 # KidBMI
 
-Standalone calculator for children: BMI, lean body weight (Janmahasatian, Boer, James, Hume, Peters), Peters extracellular fluid volume, and RCPCH paediatric BMI centiles (ages 2 to 20).
+Standalone calculator for children: BMI, lean body weight (Janmahasatian, Boer, James, Hume, Peters), Peters extracellular fluid volume, and RCPCH paediatric BMI centiles (ages 2 to 20), including underweight.
 
 - `src/engine.js`: all equations and rules. No screen code, no global state; audit and test it on its own.
 - `src/template.html`: the UI. It only reads inputs, calls `KidBMI.*` and displays results.
-- `src/data/rcpch-bmi-centiles.json`: 91st, 98th and 99.6th centile lines digitised from the RCPCH charts (carried over from Admix).
+- `src/data/rcpch-bmi-centiles.json`: the nine RCPCH BMI centile lines, 0.4th to 99.6th (source and licence note in `src/data/README.md`).
 - `scripts/build.js`: inlines engine and data into one offline file, `dist/index.html` (usable as a Capacitor web dir).
 - `tests/engine.js`: hand-checked worked examples. `tests/equivalence.js`: compares against the Admix engine (set `ADMIX_ENGINE=/path/to/admix/src/engine.js`).
 
