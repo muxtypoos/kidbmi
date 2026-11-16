@@ -29,6 +29,7 @@ input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visi
 .seg input{position:absolute;opacity:0;pointer-events:none}
 .seg span{display:block;padding:11px 8px;cursor:pointer;background:var(--bg)}
 .seg input:checked+span{background:var(--pr);color:var(--prt);font-weight:600}
+.seg input[value=M]:checked+span{background:#1f6fe0;color:#fff}
 .seg input:focus-visible+span{outline:3px solid var(--pr);outline-offset:-3px}
 .msg{border-radius:10px;padding:9px 12px;margin:0 0 10px;font-size:14px}
 .msg.w{background:var(--wa);color:var(--wat)}.msg.e{background:var(--er);color:var(--ert)}.msg.o{background:var(--ok);color:var(--okt)}
@@ -165,21 +166,25 @@ function bmiBox(b,r,i){
     '<div class="bd">'+esc(r.band)+'</div>'+(r.level===-1?'<div class="bh">Below the 2nd centile is unusual and may reflect undernutrition or a small build (RCPCH).</div>':r.level===-2?'<div class="bh">Below the 0.4th centile: the RCPCH advises further assessment.</div>':'')+
     '<div class="bn">Nearest centile line: <b>'+nl.name+'</b> ('+n(fl(nl.value,1))+' kg/m²), BMI is <b>'+dir+'</b></div>'+ruler(r)+'</div>'}
 
-/* Horizontal ruler: BMI scale with the nine RCPCH centile lines at this age and a triangle marking the patient's BMI on the line.
-   Tag text is small. Tags are on two alternating rows so neighbouring tags never overlap, and the BMI label stays inside the picture. */
+/* Horizontal ruler: the nine RCPCH centile lines at this age, evenly spaced, and a triangle marking the patient's BMI on the line.
+   Tag text is small. Tags are small and in one row, and the BMI label stays inside the picture. */
 function ruler(r){
-  var c=r.cc,lo=c.c04-3,hi=c.c996+3,W=320,L=14,Rr=306,y=40,hh=6,X=function(v){return L+(Math.min(hi,Math.max(lo,v))-lo)/(hi-lo)*(Rr-L)};
-  var seg=[[lo,c.c04,"var(--l04)"],[c.c04,c.c2,"var(--l2)"],[c.c2,c.c91,"var(--usual)"],[c.c91,c.c98,"var(--l91)"],[c.c98,c.c996,"var(--l98)"],[c.c996,hi,"var(--l996)"]],g="";
-  seg.forEach(function(s){g+='<rect x="'+X(s[0])+'" y="'+y+'" width="'+(X(s[1])-X(s[0]))+'" height="'+hh+'" fill="'+s[2]+'"/>'});
-  ["c9","c25","c75"].forEach(function(k){var x=X(c[k]);g+='<line x1="'+x+'" x2="'+x+'" y1="'+(y-1)+'" y2="'+(y+hh+1)+'" stroke="var(--tx)" stroke-width=".7" opacity=".6"/>'});
-  [["c04","0.4th"],["c2","2nd"],["c50","50th"],["c91","91st"],["c98","98th"],["c996","99.6th"]].forEach(function(l,j){var x=X(c[l[0]]),d=j%2?24:0;
-    g+='<line x1="'+x+'" x2="'+x+'" y1="'+(y-2)+'" y2="'+(y+hh+2+d)+'" stroke="var(--tx)" stroke-width="1"/>'+
-       '<text x="'+x+'" y="'+(y+hh+13+d)+'" text-anchor="middle" style="font-size:10px">'+l[1]+'</text>'+
-       '<text x="'+x+'" y="'+(y+hh+24+d)+'" text-anchor="middle" style="font-size:10px;font-weight:700;fill:var(--tx)">'+n(fl(c[l[0]],1))+'</text>'});
-  var px=X(r.bmi),off=r.bmi<lo||r.bmi>hi,lab='BMI '+n(fl(r.bmi,1))+(off?' (off scale)':''),w=lab.length*6.6+4,lx=Math.min(Rr+6-w/2,Math.max(L-6+w/2,px));
+  /* The nine lines are drawn at equal spacing (the position between two lines is interpolated by BMI), so notches are evenly spaced. */
+  var c=r.cc,K=["c04","c2","c9","c25","c50","c75","c91","c98","c996"],NM=["0.4th","2nd","9th","25th","50th","75th","91st","98th","99.6th"],V=K.map(function(k){return c[k]}),
+      W=320,y=40,hh=6,E=.6,step=300/(8+2*E),X0=10,XI=function(i){return X0+(i+E)*step},
+      pos=function(v){if(v<=V[0])return Math.max(-E,-(V[0]-v)/(V[1]-V[0]));if(v>=V[8])return Math.min(8+E,8+(v-V[8])/(V[8]-V[7]));
+        for(var i=0;i<8;i++)if(v<=V[i+1])return i+(v-V[i])/(V[i+1]-V[i]);return 8},
+      X=function(v){return XI(pos(v))},g="";
+  [[-E,0,"var(--l04)"],[0,1,"var(--l2)"],[1,6,"var(--usual)"],[6,7,"var(--l91)"],[7,8,"var(--l98)"],[8,8+E,"var(--l996)"]].forEach(function(s){
+    g+='<rect x="'+XI(s[0])+'" y="'+y+'" width="'+(XI(s[1])-XI(s[0]))+'" height="'+hh+'" fill="'+s[2]+'"/>'});
+  K.forEach(function(k,i){var x=XI(i),major=i!==2&&i!==3&&i!==5;
+    g+='<line x1="'+x+'" x2="'+x+'" y1="'+(y-2)+'" y2="'+(y+hh+2)+'" stroke="var(--tx)" stroke-width="'+(major?1:.7)+'"'+(major?'':' opacity=".7"')+'/>'+
+       '<text x="'+x+'" y="'+(y+hh+12)+'" text-anchor="middle" style="font-size:8.5px">'+NM[i]+'</text>'+
+       '<text x="'+x+'" y="'+(y+hh+22)+'" text-anchor="middle" style="font-size:9px;font-weight:700;fill:var(--tx)">'+n(fl(V[i],1))+'</text>'});
+  var px=X(r.bmi),off=r.bmi<V[0]-(V[1]-V[0])*E||r.bmi>V[8]+(V[8]-V[7])*E,lab='BMI '+n(fl(r.bmi,1))+(off?' (off scale)':''),w=lab.length*6.6+4,lx=Math.min(W-4-w/2,Math.max(4+w/2,px));
   g+='<path d="M'+(px-7)+' '+(y-15)+'L'+(px+7)+' '+(y-15)+'L'+px+' '+(y-1)+'Z" fill="var(--pt)" stroke="var(--tx)" stroke-width="1.5" stroke-linejoin="round"/>'+
      '<text x="'+lx+'" y="'+(y-21)+'" text-anchor="middle" style="fill:var(--tx);font-weight:700;font-size:12px">'+lab+'</text>';
-  return'<svg viewBox="0 0 '+W+' 100" style="overflow:visible" role="img" aria-label="BMI '+n(fl(r.bmi,1))+' against the RCPCH centile lines at this age: 0.4th '+n(fl(c.c04,1))+', 2nd '+n(fl(c.c2,1))+', 50th '+n(fl(c.c50,1))+', 91st '+n(fl(c.c91,1))+', 98th '+n(fl(c.c98,1))+', 99.6th '+n(fl(c.c996,1))+'. '+esc(r.band)+'">'+g+'</svg>'}
+  return'<svg viewBox="0 0 '+W+' 80" style="overflow:visible" role="img" aria-label="BMI '+n(fl(r.bmi,1))+' against the RCPCH centile lines at this age: 0.4th '+n(fl(c.c04,1))+', 2nd '+n(fl(c.c2,1))+', 50th '+n(fl(c.c50,1))+', 91st '+n(fl(c.c91,1))+', 98th '+n(fl(c.c98,1))+', 99.6th '+n(fl(c.c996,1))+'. '+esc(r.band)+'">'+g+'</svg>'}
 
 function paed(r){
   $("pc").style.display=r.ok?"":"none";
