@@ -23,3 +23,5 @@ Open `selftest.csv` in any spreadsheet. Every row is one calculation: the inputs
 - **extremes:** tiny and huge values, zero, missing, negative, wrong units, and the edges at 2, 4 and 20 years and at the weight/height limits.
 
 Columns ending `_shown_in_app` are exactly what the screen displays (rounded down to 0.1). Regenerate with `npm run selftest`; `npm test` fails if the file is out of date or any row disagrees.
+
+Printing: the Print button calls window.print() in a browser. In the Capacitor Android app it calls the native `PrintPlugin` (the same plugin Admix uses), so that plugin must be in the Android project.

@@ -60,13 +60,33 @@ summary{cursor:pointer;font-weight:600;min-height:32px}
 .bmibox.lvm1 .bd,.bmibox.lvm2 .bd{color:var(--lowt)}.bmibox .bh{font-size:13px;color:var(--mu);margin:2px 0 0}.bmibox.lv0 .bd{color:var(--okt)}.bmibox.lv1 .bd{color:var(--wat)}.bmibox.lv2 .bd,.bmibox.lv3 .bd{color:var(--ert)}
 .bmibox svg{width:100%;height:auto;display:block;margin-top:4px}.bmibox svg text{fill:var(--mu);font-size:12px;font-family:inherit}
 @media (max-width:420px){.big .v{font-size:26px}.bmibox .bv{font-size:34px}}
-@media print{header button,#copy,#reset,.noprint{display:none!important}:root{color-scheme:light}body{background:#fff}.card{break-inside:avoid}}
+.pd{display:none}
+@page{size:A4;margin:8mm}
+@media print{
+:root:root:root:root{color-scheme:light;--bg:#fff;--card:#fff;--tx:#000;--mu:#444;--bd:#bbb;--ok:#e6f6ec;--okt:#15693a;--wa:#fff4d6;--wat:#8a5a00;--er:#fde8e8;--ert:#a11d1d;--bar:#f9d6e5;--bar2:#d6336c;--l91:#b8860b;--l98:#c2570c;--l996:#a11d1d;--l2:#4f8fd1;--l04:#1f5fa8;--usual:#cfe3d4;--lowt:#1f5fa8;--pt:#ffd400}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+html,body{background:#fff;font-size:11px;line-height:1.3}
+header,.noprint,#reset,#copy,#inp,#msgs:empty{display:none!important}
+.pd{display:block;grid-column:1/-1;font-weight:700;font-size:12px;border-bottom:1px solid #888;padding-bottom:3px}
+main{max-width:none;padding:0;display:grid;grid-template-columns:1.1fr 1fr;gap:6px 8px;align-items:start}
+#msgs,#wkc{grid-column:1/-1}
+.card{break-inside:avoid;margin:0;padding:6px 8px;border-radius:6px}
+.card h2{font-size:10px;margin:0 0 4px}
+.hero{gap:5px}.big{padding:4px 7px;border-radius:6px}.big .k,.big .s{font-size:9px}.big .v{font-size:19px}.big .v small{font-size:10px}
+.bmibox{padding:6px 8px;margin-bottom:5px;border-radius:6px}.bmibox .k{font-size:10px}.bmibox .bv{font-size:26px}.bmibox .bv small{font-size:11px}.bmibox .bd{font-size:12px}.bmibox .bn,.bmibox .bh{font-size:10px;margin:3px 0 0}
+#pcb p,.mu{font-size:9px}
+#chartw{max-width:78mm!important;margin:4px auto 0!important}
+#wkc details{border:0;padding:0}#wkc summary{font-size:10px;min-height:0;pointer-events:none}#wkc summary::marker{content:""}
+#wkc p,#wkc div{font-size:9px;margin:2px 0}.f{font-size:8.5px;padding:2px 5px;margin:2px 0}
+#wkc{column-count:2;column-gap:10px}#wkc details{break-inside:avoid}
+}
 </style></head>
 <body>
-<header><h1>KidBMI<small>RCPCH BMI centiles · Lean body weight · Peters</small></h1><button id="theme" aria-label="Switch light or dark theme" title="Switch light or dark theme" style="padding:0 10px;font-size:13px">Theme</button></header>
+<header><h1>KidBMI<small>RCPCH BMI centiles · Lean body weight · Peters</small></h1><button id="prt" onclick="printPage()" aria-label="Print" title="Print on one A4 page" style="padding:0 10px;font-size:13px">&#128424; Print</button><button id="theme" aria-label="Switch light or dark theme" title="Switch light or dark theme" style="padding:0 10px;font-size:13px">Theme</button></header>
 <main>
+<div class="pd" id="pd"></div>
 
-<section class="card" aria-labelledby="h-in">
+<section class="card" id="inp" aria-labelledby="h-in">
 <h2 id="h-in">Patient</h2>
 <div class="grid">
 <div><label for="w">Weight (kg)</label><input id="w" type="number" inputmode="decimal" min="0" step="any" autocomplete="off"></div>
@@ -94,17 +114,17 @@ summary{cursor:pointer;font-weight:600;min-height:32px}
 <p class="mu" style="margin:6px 0 0">RCPCH BMI centile charts (UK-WHO under 4 y, UK90 from 4 y), ages 2 to 20 years. Centile values are from the RCPCH nine-centile reference data (0.4th to 99.6th lines), so an exact centile between the lines is not given.</p>
 </section>
 
-<section class="card w" aria-labelledby="h-wk">
+<section class="card w" id="wkc" aria-labelledby="h-wk">
 <h2 id="h-wk">Working and reference</h2>
 <details id="wk"><summary>Show working</summary><div id="wkb" class="mu">Enter weight, height and age.</div></details>
 <details><summary>Formulas</summary><div id="fml"></div></details>
 <details><summary>About and disclaimer</summary>
-<p>KidBMI calculates body mass index, estimates lean body weight with the Peters formula (derived in children), and places children aged 2 to 20 years on the RCPCH BMI centile chart. It is decision support only. It does not replace clinical judgement or local policy, and the lean weight is an estimate that can differ by several kilograms. Check any value that will be used for dosing against your own guideline.</p>
+<p>KidBMI calculates body mass index, estimates lean body weight with the Peters formula (derived in children), and places children aged 2 to 20 years on the RCPCH BMI centile chart. It is decision support only. It does not replace clinical judgement or local policy. Check any value that will be used for dosing against your own guideline.</p>
 <p><b>Safeguards:</b> if Peters gives a lean weight under 25% of total weight (or no valid number), it is marked implausible (shown in red) and should not be relied on. Lean weight is never shown above total weight or below zero.</p>
 <p class="mu" id="ver"></p></details>
 </section>
 
-<p class="noprint" style="text-align:center"><button id="copy" class="btn">Copy summary</button></p>
+<p class="noprint" style="text-align:center"><button id="copy" class="btn">Copy summary</button> <button class="btn g" onclick="printPage()">Print (one A4 page)</button></p>
 </main>
 
 <script>
@@ -417,6 +437,22 @@ $("copy").addEventListener("click",function(){var t=summary(),b=$("copy");if(!t)
   var ok=function(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy summary"},1500)};
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,function(){fb(t,ok)});else fb(t,ok)});
 function fb(t,ok){var a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){}document.body.removeChild(a)}
+
+/* Print: one A4 page. printPrep fills the patient line and opens the working panels; the page's print stylesheet compacts the rest.
+   On Android (Capacitor) the native PrintPlugin is called, as in Admix. */
+var opened=[];
+function printPrep(){
+  var i=last.i;
+  $("pd").textContent="KidBMI summary \u00b7 printed "+new Date().toLocaleString("en-GB")+" \u00b7 "+(i.male?"Male":"Female")+", "+i.w+" kg, "+i.hcm+" cm, age "+n(fl(i.age,1))+" y \u00b7 KidBMI v"+VERSION;
+  [].forEach.call(document.querySelectorAll("#wkc details"),function(d){if(!d.open){d.open=true;opened.push(d)}})}
+window.addEventListener("beforeprint",function(){if(last&&last.ready)printPrep()});
+window.addEventListener("afterprint",function(){opened.forEach(function(d){d.open=false});opened=[]});
+function printPage(){
+  if(!last||!last.ready){alert("Enter weight, height and age first, then print.");return}
+  var C=window.Capacitor,P=C&&C.Plugins&&C.Plugins.PrintPlugin,nat=C&&C.isNativePlatform&&C.isNativePlatform();
+  if(nat){if(!P){alert("Printing needs the PrintPlugin added to the Android app.");return}try{window.dispatchEvent(new Event("beforeprint"))}catch(e){}P.print({name:"KidBMI summary"}).catch(function(e){alert("Could not open the print dialog: "+(e&&e.message||e))});return}
+  try{window.print()}catch(e){alert("Printing is not available here. Use your browser menu to print or save as PDF.")}}
+window.printPage=printPage;
 render();
 })();
 </script>
