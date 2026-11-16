@@ -1,0 +1,7 @@
+# Changelog
+
+## 0.1.0 (first release)
+- Standalone paediatric calculator split out of Admix, with its own engine (`src/engine.js`) and UI.
+- BMI, Peters lean body weight and extracellular fluid volume, RCPCH BMI centile band and chart (ages 2 to 20).
+- Age is required. A result under 25% of total weight is shown in red and marked implausible.
+- Only the Peters formula is offered for lean body weight (the adult formulas remain in the engine, unused by the screen).
