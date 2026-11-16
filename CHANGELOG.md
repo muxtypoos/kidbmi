@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 (review fixes)
+- **Age** is now entered as years, months and days (months matter: about 1 in 10 test cases changed band within a year of age). Required.
+- **Rounding:** BMI, centile values and differences round to the nearest 0.1 (before they rounded down, which could show a BMI equal to a line it was above). Lean weight and ages still round down. Total weight is shown as entered.
+- Fixed "BMI is 0.0 above the 0.4th line". Fixed the light-mode header, which was always the dark maroon. "Show working" now prints weight and height unrounded so the sum can be checked by hand.
+- Cautions: age over 20 (paediatric tools), under 1 year (Peters not verified in infants). A lean weight cut back to total weight now says "capped at total weight" in the box.
+- A note near 4 years about the UK-WHO to UK90 reference change; a note that the ruler colours are for orientation; "(off chart)" on the chart marker when BMI is outside 8 to 50.
+- Tap the RCPCH chart to enlarge it. Warnings are no longer re-announced to screen readers on every keystroke. Android: the working panels opened for printing close again when the app returns.
+- Removed the four adult lean body weight formulas and other unused code from the engine (Peters is the only formula). Engine, tests, self-test and docs updated.
+- New screen tests (`tests/ui.js`); the Admix comparison now announces loudly when it is skipped. README states the licence questions that are still open.
+
 ## 0.1.0 (first release)
 - Standalone paediatric calculator split out of Admix, with its own engine (`src/engine.js`) and UI.
 - BMI, Peters lean body weight and extracellular fluid volume, RCPCH BMI centile band and chart (ages 2 to 20).

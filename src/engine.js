@@ -1,18 +1,16 @@
 /*
  * KidBMI calculation engine.
  *
- * Every equation and rule in the app lives in this file: BMI, the five lean body weight
- * formulas (Janmahasatian, Boer, James, Hume, Peters), the Peters extracellular fluid
- * volume, and the RCPCH paediatric BMI centile lookup. It is plain JavaScript with no
- * screen code and no global state: each function takes its inputs as arguments and
- * returns its results, so it can be read, audited and tested on its own.
+ * Every equation and rule in the app lives in this file: BMI, the Peters lean body weight and
+ * extracellular fluid volume (the only lean weight formula offered, as the adult formulas are not
+ * validated in children), and the RCPCH paediatric BMI centile lookup. It is plain JavaScript with no
+ * screen code and no global state: each function takes its inputs as arguments and returns its
+ * results, so it can be read, audited and tested on its own.
  *
- * Units: weight kg, height cm (hm where a function says metres), age years,
- * BMI kg/m2, volumes litres.
+ * Units: weight kg, height cm, age years, BMI kg/m2, volumes litres.
  *
- * The formulas, the 25% plausibility check and the centile interpolation are carried
- * over unchanged from the Admix engine (tests/equivalence.js checks they still agree).
- * The build inserts this file into the page unchanged.
+ * Peters and the centile interpolation were carried over from the Admix engine (tests/equivalence.js
+ * checks they still agree). The build inserts this file into the page unchanged.
  */
 var KidBMI = (function () {
   "use strict";
@@ -23,15 +21,16 @@ var KidBMI = (function () {
     return Math.floor(v * m + 1e-9) / m;
   }
 
+  /* Round to NEAREST d decimals (tiny epsilon so 12.85 shows as 12.9). Used for BMI, centile values and differences. */
+  function rd(v, d) {
+    var m = Math.pow(10, d == null ? 1 : d);
+    return Math.round(v * m + 1e-9) / m;
+  }
+
   /* ---------- 1. Formula catalogue ---------- */
   var FORMULAS = [
-    { id: "jan", name: "Janmahasatian", male: "9270 × W ÷ (6680 + 216 × BMI)", female: "9270 × W ÷ (8780 + 244 × BMI)" },
-    { id: "boer", name: "Boer", male: "0.407 × W + 0.267 × H − 19.2", female: "0.252 × W + 0.473 × H − 48.3" },
-    { id: "james", name: "James", male: "1.1 × W − 128 × (W ÷ H)²", female: "1.07 × W − 148 × (W ÷ H)²" },
-    { id: "hume", name: "Hume", male: "0.3281 × W + 0.33929 × H − 29.5336", female: "0.29569 × W + 0.41813 × H − 43.2933" },
     { id: "peters", name: "Peters", male: "3.8 × 0.0215 × W^0.6469 × H^0.7236", female: "3.8 × 0.0215 × W^0.6469 × H^0.7236" }
   ];
-  var IDS = FORMULAS.map(function (f) { return f.id; });
 
   /* ---------- 2. Basic measures ---------- */
 
@@ -48,6 +47,12 @@ var KidBMI = (function () {
     return v * (f == null ? 1 : f);
   }
 
+  /* Age in years from separate years, months and days boxes (blank or invalid counts as 0). */
+  function ageFromParts(y, m, d) {
+    var p = function (v) { v = parseFloat(v); return v > 0 ? v : 0; };
+    return p(y) + p(m) / 12 + p(d) / 365.25;
+  }
+
   /* ---------- 3. Lean body weight ---------- */
 
   /* Peters extracellular fluid volume, litres (W kg, H cm). */
@@ -55,53 +60,20 @@ var KidBMI = (function () {
     return 0.0215 * Math.pow(w, 0.6469) * Math.pow(hcm, 0.7236);
   }
 
-  /* One formula, no safeguards. f = id, w kg, H cm, male boolean, b = BMI. */
-  function lbwRaw(f, w, H, male, b) {
-    switch (f) {
-      case "boer":
-        return male ? 0.407 * w + 0.267 * H - 19.2 : 0.252 * w + 0.473 * H - 48.3;
-      case "james":
-        return male ? 1.1 * w - 128 * Math.pow(w / H, 2) : 1.07 * w - 148 * Math.pow(w / H, 2);
-      case "hume":
-        return male ? 0.3281 * w + 0.33929 * H - 29.5336 : 0.29569 * w + 0.41813 * H - 43.2933;
-      case "peters":
-        return 3.8 * petersECV(w, H);
-      default: /* "jan" */
-        return male ? 9270 * w / (6680 + 216 * b) : 9270 * w / (8780 + 244 * b);
-    }
-  }
-
-  /* Lean body weight with safeguards: if the chosen formula gives less than 25% of total
-     weight (or not a number) the result is flagged "implausible" (implausible is true) but the number is
-     still returned so it can be shown, marked. The value is never above total weight and never below 0
-     (0 if the formula gave no number). Returns the working as well as the answer.
-     f = id, w kg, hcm cm, male boolean. */
-  function lbw(f, w, hcm, male) {
+  /* Peters lean body weight with safeguards: if it comes to less than 25% of total weight (or is not a
+     number) the result is flagged "implausible" (implausible is true) but the number is still returned so it
+     can be shown, marked. The value is never above total weight (capped is true if it had to be cut back) and
+     never below 0. Returns the working as well as the answer. w kg, hcm cm. */
+  function lbw(w, hcm) {
     var b = bmi(w, hcm);
-    if (!(b > 0)) return { ok: false, formula: f, value: null, raw: 0, implausible: false, capped: false, bmi: 0 };
-    var raw = lbwRaw(f, w, hcm, male, b);
-    var implausible = !(raw >= 0.25 * w);
-    return { ok: true, formula: f, value: isNaN(raw) ? 0 : Math.max(0, Math.min(w, raw)), raw: raw, implausible: implausible, capped: raw > w, bmi: b };
-  }
-
-  /* All five formulas side by side for the same patient. */
-  function lbwAll(w, hcm, male) {
-    return FORMULAS.map(function (fm) {
-      var r = lbw(fm.id, w, hcm, male);
-      return { id: fm.id, name: fm.name, value: r.value, pct: 100 * r.value / w, implausible: r.implausible, capped: r.capped };
-    });
-  }
-
-  /* Which formula "Auto" picks: Peters for children (age up to 16 y, or height up to 120 cm,
-     or weight under 30 kg: the same triggers Admix uses to offer paediatric mode),
-     otherwise Janmahasatian. */
-  function suggestFormula(ageY, hcm, w) {
-    return (ageY > 0 && ageY <= 16) || (hcm > 0 && hcm <= 120) || (w > 0 && w < 30) ? "peters" : "jan";
+    if (!(b > 0)) return { ok: false, formula: "peters", value: null, raw: 0, implausible: false, capped: false, bmi: 0 };
+    var raw = 3.8 * petersECV(w, hcm);
+    return { ok: true, formula: "peters", value: isNaN(raw) ? 0 : Math.max(0, Math.min(w, raw)), raw: raw, implausible: !(raw >= 0.25 * w), capped: raw > w, bmi: b };
   }
 
   /* ---------- 4. RCPCH paediatric BMI centiles ----------
-     CEN = the centile data table: CEN[sex "M"|"F"][line "c91"|"c98"|"c996"] = [segment under 4 y
-     (UK-WHO), segment from 4 y (UK90)], each a list of [age y, BMI] points read from the RCPCH charts. */
+     CEN = the centile data table: CEN[sex "M"|"F"][line "c04"|"c2"|...|"c996"] = [segment under 4 y
+     (UK-WHO), segment from 4 y (UK90)], each a list of [age y, BMI] points from the RCPCH nine-centile reference data. */
 
   /* BMI on centile line k at age a (years), linear between points, flat outside the chart's ends. */
   function cen(CEN, s, k, a) {
@@ -151,7 +123,7 @@ var KidBMI = (function () {
       if (!nearest || Math.abs(d) < Math.abs(nearest.diff) - 1e-12) nearest = { k: l.k, name: l.name, value: c[l.k], diff: d };
     });
     var level = b >= c.c996 ? 3 : b >= c.c98 ? 2 : b >= c.c91 ? 1 : b < c.c04 ? -2 : b < c.c2 ? -1 : 0;
-    return { ok: true, bmi: b, age: a, sex: sx, cc: c, band: bandFor(level), level: level, above91: b >= c.c91, nearest: nearest };
+    return { ok: true, bmi: b, age: a, sex: sx, cc: c, band: bandFor(level), level: level, above91: b >= c.c91, nearest: nearest, nearSwitch: Math.abs(a - 4) < 0.5 };
   }
 
   /* ---------- 5. Input plausibility ---------- */
@@ -169,14 +141,16 @@ var KidBMI = (function () {
     else if (i.hcm > 0 && i.hcm < 30) m.push("Height " + fl(i.hcm, 0) + " cm is outside the usual range.");
     var b = bmi(i.w, i.hcm);
     if (!blocked && b > 0 && (b < 9 || b > 100)) m.push("BMI " + fl(b, 1).toFixed(1) + " is very unusual: check weight and height.");
-    if (i.age > 120) { m.push("Age over 120 years: check the age and its unit."); }
+    if (i.age > 120) m.push("Age over 120 years: check the age you entered.");
+    else if (i.age > 20) m.push("Age over 20 years: KidBMI is built for children. Peters and the RCPCH chart are paediatric tools, so use an adult method for adults.");
+    else if (i.age > 0 && i.age < 1) m.push("Under 1 year: the RCPCH chart cannot be used, and this app has not verified Peters lean body weight in infants. Use it with caution.");
     return { messages: m, blocked: blocked };
   }
 
   return {
-    fl: fl, FORMULAS: FORMULAS, IDS: IDS,
-    bmi: bmi, ageYears: ageYears,
-    petersECV: petersECV, lbwRaw: lbwRaw, lbw: lbw, lbwAll: lbwAll, suggestFormula: suggestFormula,
+    fl: fl, rd: rd, FORMULAS: FORMULAS,
+    bmi: bmi, ageYears: ageYears, ageFromParts: ageFromParts,
+    petersECV: petersECV, lbw: lbw,
     cen: cen, paediatric: paediatric, BANDS: BANDS, LINES: LINES,
     checks: checks
   };

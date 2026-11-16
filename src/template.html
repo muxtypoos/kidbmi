@@ -10,7 +10,8 @@
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
 header{background:linear-gradient(135deg,#d6336c,#f783ac);color:#fff;padding:max(12px,env(safe-area-inset-top)) 16px 12px;display:flex;align-items:center;gap:10px}
-:root[data-theme="dark"] header,:root:not([data-theme="light"]) header{background:linear-gradient(135deg,#8c2352,#b83266)}
+:root[data-theme="dark"] header{background:linear-gradient(135deg,#8c2352,#b83266)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) header{background:linear-gradient(135deg,#8c2352,#b83266)}}
 header h1{font-size:19px;margin:0;flex:1}header small{display:block;font-weight:400;font-size:12px;opacity:.9}
 header button{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:8px;min-height:36px;min-width:36px;font-size:16px}
 main{max-width:720px;margin:0 auto;padding:12px 12px 40px}
@@ -23,7 +24,7 @@ input,select,button{font:inherit;color:inherit}
 input[type=number],select{width:100%;min-height:46px;padding:8px 10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);font-size:18px}
 select{font-size:16px;padding-right:4px}
 input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--pr);outline-offset:1px}
-.row{display:flex;gap:8px}.row>*{flex:1}.row>.unit{flex:0 0 46%}
+.row{display:flex;gap:8px}.row>*{flex:1;min-width:0}
 .seg{display:flex;border:1px solid var(--bd);border-radius:10px;overflow:hidden}
 .seg label{flex:1;margin:0;text-align:center;color:var(--tx);font-size:16px}
 .seg input{position:absolute;opacity:0;pointer-events:none}
@@ -36,17 +37,6 @@ input:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visi
 .hero{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .big{border:1px solid var(--bd);border-radius:12px;padding:10px 12px;background:var(--bg)}
 .big .k{font-size:12px;color:var(--mu)}.big .v{font-size:30px;font-weight:700;line-height:1.15}.big .v small{font-size:14px;font-weight:500;color:var(--mu)}.big .s{font-size:12px;color:var(--mu)}
-.tbl{width:100%;border-collapse:collapse;font-size:15px}
-.tbl th{font-weight:500;color:var(--mu);font-size:12px;text-align:left;padding:4px 6px}
-.tbl td{padding:7px 6px;border-top:1px solid var(--bd);vertical-align:middle}
-.tbl td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.tbl tr.sel td{background:color-mix(in srgb,var(--pr) 12%,transparent);font-weight:600}
-.bar{height:8px;border-radius:4px;background:var(--bar);min-width:60px;position:relative;overflow:hidden}.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--bar2);border-radius:4px}
-.tag{font-size:11px;border:1px solid var(--bd);border-radius:99px;padding:1px 7px;color:var(--mu);margin-left:4px;white-space:nowrap}
-svg.chart{width:100%;height:auto;display:block}
-svg.chart text{fill:var(--mu);font-size:15px;font-family:inherit}
-svg.chart .ax{stroke:var(--bd);stroke-width:1}
-svg.chart .gr{stroke:var(--bd);stroke-width:.6;opacity:.7}
 details{border-top:1px solid var(--bd);padding:8px 0}details:first-of-type{border-top:0}
 summary{cursor:pointer;font-weight:600;min-height:32px}
 .w p,.w div{font-size:14px;margin:6px 0}
@@ -60,13 +50,17 @@ summary{cursor:pointer;font-weight:600;min-height:32px}
 .bmibox.lvm1 .bd,.bmibox.lvm2 .bd{color:var(--lowt)}.bmibox .bh{font-size:13px;color:var(--mu);margin:2px 0 0}.bmibox.lv0 .bd{color:var(--okt)}.bmibox.lv1 .bd{color:var(--wat)}.bmibox.lv2 .bd,.bmibox.lv3 .bd{color:var(--ert)}
 .bmibox svg{width:100%;height:auto;display:block;margin-top:4px}.bmibox svg text{fill:var(--mu);font-size:12px;font-family:inherit}
 @media (max-width:420px){.big .v{font-size:26px}.bmibox .bv{font-size:34px}}
+#chartw{cursor:zoom-in}
+#zoom{display:none;position:fixed;inset:0;z-index:20;background:rgba(0,0,0,.88);overflow:auto;-webkit-overflow-scrolling:touch}
+#zoom.on{display:block}#zin{position:relative;width:1000px;max-width:none;margin:56px auto 24px;background:#fff}
+#zx{position:fixed;top:max(10px,env(safe-area-inset-top));right:10px;z-index:21;min-height:40px}
 .pd{display:none}
 @page{size:A4;margin:8mm}
 @media print{
 :root:root:root:root{color-scheme:light;--bg:#fff;--card:#fff;--tx:#000;--mu:#444;--bd:#bbb;--ok:#e6f6ec;--okt:#15693a;--wa:#fff4d6;--wat:#8a5a00;--er:#fde8e8;--ert:#a11d1d;--bar:#f9d6e5;--bar2:#d6336c;--l91:#b8860b;--l98:#c2570c;--l996:#a11d1d;--l2:#4f8fd1;--l9:#8fbbe6;--l04:#1f5fa8;--usual:#cfe3d4;--lowt:#1f5fa8;--pt:#ffd400}
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 html,body{background:#fff;font-size:11px;line-height:1.3}
-header,.noprint,#reset,#copy,#inp,#msgs:empty{display:none!important}
+header,.noprint,#reset,#copy,#inp,#msgs:empty,#zoom,#zx{display:none!important}
 .pd{display:block;grid-column:1/-1;font-weight:700;font-size:12px;border-bottom:1px solid #888;padding-bottom:3px}
 main{max-width:none;padding:0;display:grid;grid-template-columns:1.1fr 1fr;gap:6px 8px;align-items:start}
 #msgs,#wkc{grid-column:1/-1}
@@ -83,6 +77,7 @@ main{max-width:none;padding:0;display:grid;grid-template-columns:1.1fr 1fr;gap:6
 </style></head>
 <body>
 <header><h1>KidBMI<small>RCPCH BMI centiles · Lean body weight · Peters</small></h1><button id="prt" onclick="printPage()" aria-label="Print" title="Print on one A4 page" style="padding:0 10px;font-size:13px">&#128424; Print</button><button id="theme" aria-label="Switch light or dark theme" title="Switch light or dark theme" style="padding:0 10px;font-size:13px">Theme</button></header>
+<div id="zoom" aria-modal="true" role="dialog" aria-label="RCPCH chart, enlarged"><button id="zx" class="btn">Close</button><div id="zin"></div></div>
 <main>
 <div class="pd" id="pd"></div>
 
@@ -93,13 +88,13 @@ main{max-width:none;padding:0;display:grid;grid-template-columns:1.1fr 1fr;gap:6
 <div><label for="h">Height (cm)</label><input id="h" type="number" inputmode="decimal" min="0" step="any" autocomplete="off"></div>
 <div><label id="sl">Sex</label>
 <div class="seg" role="radiogroup" aria-labelledby="sl"><label><input type="radio" name="s" value="M" checked><span>Male</span></label><label><input type="radio" name="s" value="F"><span>Female</span></label></div></div>
-<div><label for="age">Age</label>
-<div class="row"><input id="age" type="number" inputmode="decimal" min="0" step="any" autocomplete="off" required><select id="ageu" class="unit" aria-label="Age unit"><option value="y">years</option><option value="m">months</option><option value="w">weeks</option><option value="d">days</option></select></div></div>
+<div class="full"><label id="agel">Age (required: months matter, centiles change through the year)</label>
+<div class="row" role="group" aria-labelledby="agel"><div><label for="agey">Years</label><input id="agey" type="number" inputmode="decimal" min="0" step="any" autocomplete="off"></div><div><label for="agem">Months</label><input id="agem" type="number" inputmode="numeric" min="0" step="any" autocomplete="off"></div><div><label for="aged">Days</label><input id="aged" type="number" inputmode="numeric" min="0" step="any" autocomplete="off"></div></div></div>
 </div>
 <p class="mu" style="margin:10px 0 0">Nothing you enter leaves this device or is stored. <button id="reset" class="btn g" style="min-height:32px;padding:0 10px;margin-left:6px">Clear</button></p>
 </section>
 
-<div id="msgs"></div>
+<div id="msgs" aria-live="polite"></div>
 
 <section class="card" id="res" aria-labelledby="h-res" aria-live="polite">
 <h2 id="h-res">Results</h2>
@@ -110,7 +105,7 @@ main{max-width:none;padding:0;display:grid;grid-template-columns:1.1fr 1fr;gap:6
 <section class="card" id="pc" aria-labelledby="h-pc" style="display:none">
 <h2 id="h-pc">Paediatric BMI (RCPCH centiles)</h2>
 <div id="pcb"></div>
-<div id="chartw" style="position:relative;max-width:560px;margin:8px auto 0"><img id="bmimg" alt="RCPCH BMI centile chart" style="width:100%;display:block;border:1px solid var(--bd);border-radius:10px;background:#fff"><svg id="bmsv" viewBox="0 0 1000 1075" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></svg></div>
+<div id="chartw" role="button" tabindex="0" aria-label="Enlarge the RCPCH chart" title="Tap to enlarge" style="position:relative;max-width:560px;margin:8px auto 0"><img id="bmimg" alt="RCPCH BMI centile chart" style="width:100%;display:block;border:1px solid var(--bd);border-radius:10px;background:#fff"><svg id="bmsv" viewBox="0 0 1000 1075" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></svg></div>
 <p class="mu" style="margin:6px 0 0">RCPCH BMI centile charts (UK-WHO under 4 y, UK90 from 4 y), ages 2 to 20 years. Centile values are from the RCPCH nine-centile reference data (0.4th to 99.6th lines), so an exact centile between the lines is not given.</p>
 </section>
 
@@ -146,30 +141,28 @@ $("fml").innerHTML=A.FORMULAS.filter(function(f){return f.id==="peters"}).map(fu
 $("ver").textContent="KidBMI v"+VERSION;
 
 function read(){
-  var w=parseFloat($("w").value),h=parseFloat($("h").value),av=parseFloat($("age").value),u=$("ageu").value;
+  var w=parseFloat($("w").value),h=parseFloat($("h").value);
   var male=document.querySelector('input[name=s]:checked').value==="M";
-  return{w:w>0?w:0,hcm:h>0?h:0,age:A.ageYears(av,u),male:male,ageRaw:av,ageUnit:u,entered:{w:$("w").value!=="",h:$("h").value!=="",age:$("age").value!==""}};
+  return{w:w>0?w:0,hcm:h>0?h:0,age:A.ageFromParts($("agey").value,$("agem").value,$("aged").value),male:male,entered:{w:$("w").value!=="",h:$("h").value!=="",age:$("agey").value!==""||$("agem").value!==""||$("aged").value!==""}};
 }
-function formulaFor(i){return "peters"}
-function nameOf(id){return A.FORMULAS.filter(function(f){return f.id===id})[0].name}
-var last=null;
+var last=null,lastMsgs="";
 
 function render(){
-  var i=read(),c=A.checks(i),msgs=c.messages.map(function(m){return'<div class="msg w" role="alert">'+esc(m)+'</div>'}).join("");
-  $("msgs").innerHTML=msgs;
-  var b=A.bmi(i.w,i.hcm),fid=formulaFor(i),ready=!c.blocked&&i.w>0&&i.hcm>0&&i.age>0;
-  last={i:i,fid:fid,ready:ready};
+  var i=read(),c=A.checks(i),msgs=c.messages.map(function(m){return'<div class="msg w">'+esc(m)+'</div>'}).join("");
+  if(msgs!==lastMsgs){$("msgs").innerHTML=msgs;lastMsgs=msgs}
+  var b=A.bmi(i.w,i.hcm),ready=!c.blocked&&i.w>0&&i.hcm>0&&i.age>0;
+  last={i:i,ready:ready};
   if(!ready){
     $("resb").innerHTML='<p class="mu" style="margin:0">'+(c.blocked?"Correct the value flagged above to continue.":"Enter weight, height and age to calculate BMI, lean body weight and the RCPCH centile.")+'</p>';
     $("pc").style.display="none";$("wkb").innerHTML="Enter weight, height and age.";return}
-  var L=A.lbw(fid,i.w,i.hcm,i.male),ecv=A.petersECV(i.w,i.hcm);
+  var L=A.lbw(i.w,i.hcm),ecv=A.petersECV(i.w,i.hcm);
   var r=A.paediatric(CEN,{w:i.w,hcm:i.hcm,age:i.age,male:i.male});
   var h=bmiBox(b,r,i)+'<div class="hero">'+
-   '<div class="big" style="grid-column:1/-1"><div class="k">Lean body weight</div><div class="v">'+(L.implausible?'<span style="color:var(--ert)">'+n(fl(L.value,1))+' <small style="color:var(--ert)">kg</small></span>':n(fl(L.value,1))+' <small>kg</small>')+'</div><div class="s">'+nameOf(L.formula)+' · '+n(100*L.value/i.w,0)+'% of total'+(L.implausible?' · <b style="color:var(--ert)">implausible</b>':'')+'</div></div>'+
-   '<div class="big"><div class="k">Total body weight</div><div class="v">'+n(i.w,i.w%1?1:0)+' <small>kg</small></div></div>'+
+   '<div class="big" style="grid-column:1/-1"><div class="k">Lean body weight</div><div class="v">'+(L.implausible?'<span style="color:var(--ert)">'+n(fl(L.value,1))+' <small style="color:var(--ert)">kg</small></span>':n(fl(L.value,1))+' <small>kg</small>')+'</div><div class="s">Peters · '+n(100*L.value/i.w,0)+'% of total'+(L.implausible?' · <b style="color:var(--ert)">implausible</b>':L.capped?' · capped at total weight':'')+'</div></div>'+
+   '<div class="big"><div class="k">Total body weight</div><div class="v">'+(Math.round(i.w*1000)/1000)+' <small>kg</small></div></div>'+
    '<div class="big"><div class="k">Peters ECV</div><div class="v">'+n(ecv,2)+' <small>L</small></div><div class="s">extracellular fluid volume</div></div></div>';
-  if(L.implausible)h+='<div class="msg w" style="margin-top:10px">'+nameOf(L.formula)+' gave an implausible lean weight for this patient (under 25% of total weight). Do not rely on it.</div>';
-  else if(L.capped)h+='<div class="msg w" style="margin-top:10px">'+nameOf(L.formula)+' gave '+n(L.raw,1)+' kg, above total weight, so lean weight is shown as total weight.</div>';
+  if(L.implausible)h+='<div class="msg w" style="margin-top:10px">Peters gave an implausible lean weight for this patient (under 25% of total weight). Do not rely on it.</div>';
+  else if(L.capped)h+='<div class="msg w" style="margin-top:10px">Peters gave '+n(L.raw,1)+' kg, above total weight, so lean weight is shown as total weight.</div>';
   $("resb").innerHTML=h;
 
 
@@ -179,12 +172,12 @@ function render(){
 
 /* The big BMI box: the number, the RCPCH band, the nearest centile line and a ruler showing where the BMI sits against the nine lines. */
 function bmiBox(b,r,i){
-  var num=n(fl(b,1));
+  var num=n(A.rd(b,1));
   if(!r.ok)return'<div class="bmibox"><div class="k">BMI (weight ÷ height²)</div><div class="bv">'+num+' <small>kg/m²</small></div><div class="bn" style="color:var(--mu)">'+esc(r.reason)+'</div></div>';
-  var sx=r.sex==="M"?"boys":"girls",nl=r.nearest,ad=Math.abs(nl.diff),dir=ad<0.05?"on the "+nl.name+" line":n(fl(ad,1))+(nl.diff>0?" above":" below")+" the "+nl.name+" line";
+  var sx=r.sex==="M"?"boys":"girls",nl=r.nearest,ad=Math.abs(nl.diff),dir=ad<0.05?"on the "+nl.name+" line":n(A.rd(ad,1))+(nl.diff>0?" above":" below")+" the "+nl.name+" line";
   return'<div class="bmibox lv'+(r.level<0?"m"+(-r.level):r.level)+'"><div class="k">BMI at '+n(fl(r.age,1))+' years ('+sx+')</div><div class="bv">'+num+' <small>kg/m²</small></div>'+
     '<div class="bd">'+esc(r.band)+'</div>'+(r.level===-1?'<div class="bh">Below the 2nd centile is unusual and may reflect undernutrition or a small build (RCPCH).</div>':r.level===-2?'<div class="bh">Below the 0.4th centile: the RCPCH advises further assessment.</div>':'')+
-    '<div class="bn">Nearest centile line: <b>'+nl.name+'</b> ('+n(fl(nl.value,1))+' kg/m²), BMI is <b>'+dir+'</b></div>'+ruler(r)+'</div>'}
+    '<div class="bn">Nearest centile line: <b>'+nl.name+'</b> ('+n(A.rd(nl.value,1))+' kg/m²), BMI is <b>'+dir+'</b></div>'+(r.nearSwitch?'<div class="bh">Around 4 years the RCPCH reference changes from UK-WHO to UK90, so the centile lines step slightly and a child can change band across the 4th birthday.</div>':'')+ruler(r)+'<div class="bh" style="margin-top:2px">Colours are for orientation. The band follows the RCPCH thresholds: 2nd, 91st, 98th and 99.6th centile.</div></div>'}
 
 /* Horizontal ruler: the nine RCPCH centile lines at this age, evenly spaced, and a triangle marking the patient's BMI on the line.
    Tag text is small. Tags are small and in one row, and the BMI label stays inside the picture. */
@@ -200,17 +193,17 @@ function ruler(r){
   K.forEach(function(k,i){var x=XI(i),major=i!==2&&i!==3&&i!==5;
     g+='<line x1="'+x+'" x2="'+x+'" y1="'+(y-2)+'" y2="'+(y+hh+2)+'" stroke="var(--tx)" stroke-width="'+(major?1:.7)+'"'+(major?'':' opacity=".7"')+'/>'+
        '<text x="'+x+'" y="'+(y+hh+12)+'" text-anchor="middle" style="font-size:8.5px">'+NM[i]+'</text>'+
-       '<text x="'+x+'" y="'+(y+hh+22)+'" text-anchor="middle" style="font-size:9px;font-weight:700;fill:var(--tx)">'+n(fl(V[i],1))+'</text>'});
-  var px=X(r.bmi),off=r.bmi<V[0]-(V[1]-V[0])*E||r.bmi>V[8]+(V[8]-V[7])*E,lab='BMI '+n(fl(r.bmi,1))+(off?' (off scale)':''),w=lab.length*6.6+4,lx=Math.min(W-4-w/2,Math.max(4+w/2,px));
+       '<text x="'+x+'" y="'+(y+hh+22)+'" text-anchor="middle" style="font-size:9px;font-weight:700;fill:var(--tx)">'+n(A.rd(V[i],1))+'</text>'});
+  var px=X(r.bmi),off=r.bmi<V[0]-(V[1]-V[0])*E||r.bmi>V[8]+(V[8]-V[7])*E,lab='BMI '+n(A.rd(r.bmi,1))+(off?' (off scale)':''),w=lab.length*6.6+4,lx=Math.min(W-4-w/2,Math.max(4+w/2,px));
   g+='<path d="M'+(px-7)+' '+(y-15)+'L'+(px+7)+' '+(y-15)+'L'+px+' '+(y-1)+'Z" fill="var(--pt)" stroke="var(--tx)" stroke-width="1.5" stroke-linejoin="round"/>'+
      '<text x="'+lx+'" y="'+(y-21)+'" text-anchor="middle" style="fill:var(--tx);font-weight:700;font-size:12px">'+lab+'</text>';
-  return'<svg viewBox="0 0 '+W+' 80" style="overflow:visible" role="img" aria-label="BMI '+n(fl(r.bmi,1))+' against the RCPCH centile lines at this age: 0.4th '+n(fl(c.c04,1))+', 2nd '+n(fl(c.c2,1))+', 50th '+n(fl(c.c50,1))+', 91st '+n(fl(c.c91,1))+', 98th '+n(fl(c.c98,1))+', 99.6th '+n(fl(c.c996,1))+'. '+esc(r.band)+'">'+g+'</svg>'}
+  return'<svg viewBox="0 0 '+W+' 80" style="overflow:visible" role="img" aria-label="BMI '+n(A.rd(r.bmi,1))+' against the RCPCH centile lines at this age: 0.4th '+n(A.rd(c.c04,1))+', 2nd '+n(A.rd(c.c2,1))+', 50th '+n(A.rd(c.c50,1))+', 91st '+n(A.rd(c.c91,1))+', 98th '+n(A.rd(c.c98,1))+', 99.6th '+n(A.rd(c.c996,1))+'. '+esc(r.band)+'">'+g+'</svg>'}
 
 function paed(r){
   $("pc").style.display=r.ok?"":"none";
   if(!r.ok)return;
   var sx=r.sex==="M"?"boys":"girls";
-  $("pcb").innerHTML='<p class="mu" style="margin:0 0 4px">Centile lines at '+n(fl(r.age,1))+' years ('+sx+'), kg/m²: '+[["c04","0.4th"],["c2","2nd"],["c9","9th"],["c25","25th"],["c50","50th"],["c75","75th"],["c91","91st"],["c98","98th"],["c996","99.6th"]].map(function(l){return l[1]+' <b style="color:var(--tx)">'+n(fl(r.cc[l[0]],1))+'</b>'}).join(' · ')+'</p>';
+  $("pcb").innerHTML='<p class="mu" style="margin:0 0 4px">Centile lines at '+n(fl(r.age,1))+' years ('+sx+'), kg/m²: '+[["c04","0.4th"],["c2","2nd"],["c9","9th"],["c25","25th"],["c50","50th"],["c75","75th"],["c91","91st"],["c98","98th"],["c996","99.6th"]].map(function(l){return l[1]+' <b style="color:var(--tx)">'+n(A.rd(r.cc[l[0]],1))+'</b>'}).join(' · ')+'</p>';
   chart(r);
 }
 
@@ -223,37 +216,46 @@ function chart(r){
   var Hh=1000/c.ar,a=Math.min(20,Math.max(2,r.age)),b=Math.min(50,Math.max(8,r.bmi)),
       X=(c.fx2+(a-2)*(c.fx20-c.fx2)/18)*1000,Y=(c.fy50+(50-b)*(c.fy8-c.fy50)/42)*Hh,lx=X>600?X-18:X+18;
   sv.setAttribute("viewBox","0 0 1000 "+Hh);
-  sv.innerHTML='<line x1="'+X+'" y1="'+Y+'" x2="'+X+'" y2="'+c.fy8*Hh+'" stroke="#000" stroke-width="2" stroke-dasharray="7 6"/><line x1="'+X+'" y1="'+Y+'" x2="'+c.fx2*1000+'" y2="'+Y+'" stroke="#000" stroke-width="2" stroke-dasharray="7 6"/><circle cx="'+X+'" cy="'+Y+'" r="13" fill="#ffd400" stroke="#000" stroke-width="4"/><text x="'+lx+'" y="'+Math.max(40,Y-16)+'" text-anchor="'+(X>600?"end":"start")+'" font-size="30" font-weight="700" fill="#000" stroke="#fff" stroke-width="7" paint-order="stroke">BMI '+n(fl(r.bmi,1))+' \u00b7 '+n(fl(r.age,1))+' y</text>';
-  im.alt="RCPCH BMI centile chart for "+(r.sex==="M"?"boys":"girls")+". Patient BMI "+n(fl(r.bmi,1))+" at "+n(fl(r.age,1))+" years: "+r.band+".";
+  sv.innerHTML='<line x1="'+X+'" y1="'+Y+'" x2="'+X+'" y2="'+c.fy8*Hh+'" stroke="#000" stroke-width="2" stroke-dasharray="7 6"/><line x1="'+X+'" y1="'+Y+'" x2="'+c.fx2*1000+'" y2="'+Y+'" stroke="#000" stroke-width="2" stroke-dasharray="7 6"/><circle cx="'+X+'" cy="'+Y+'" r="13" fill="#ffd400" stroke="#000" stroke-width="4"/><text x="'+lx+'" y="'+Math.max(40,Y-16)+'" text-anchor="'+(X>600?"end":"start")+'" font-size="30" font-weight="700" fill="#000" stroke="#fff" stroke-width="7" paint-order="stroke">BMI '+n(A.rd(r.bmi,1))+' \u00b7 '+n(fl(r.age,1))+' y'+(r.bmi>50||r.bmi<8?' (off chart)':'')+'</text>';
+  im.alt="RCPCH BMI centile chart for "+(r.sex==="M"?"boys":"girls")+". Patient BMI "+n(A.rd(r.bmi,1))+" at "+n(fl(r.age,1))+" years: "+r.band+".";
 }
 
 function working(i,L,b,ecv){
-  var fm=A.FORMULAS.filter(function(f){return f.id===L.formula})[0],male=i.male,H=i.hcm,W=i.w,s="";
-  s+='<p><b>1. BMI</b></p><div class="f">BMI = weight ÷ height² = '+n(W,2)+' ÷ ('+n(H/100,2)+')² = '+n(b,2)+' kg/m²</div>';
-  s+='<p><b>2. Lean body weight</b>: '+fm.name+' ('+(male?"male":"female")+')</p><div class="f">LBW = '+(male?fm.male:fm.female)+'\nW = '+n(W,2)+' kg, H = '+n(H,1)+' cm, BMI = '+n(b,2)+'\nresult = '+n(L.raw,2)+' kg</div>';
+  var fm=A.FORMULAS[0],male=i.male,H=i.hcm,W=i.w,s="",tr=function(v,d){return String(+(+v).toFixed(d))};
+  s+='<p><b>1. BMI</b></p><div class="f">BMI = weight ÷ height² = '+tr(W,3)+' ÷ ('+tr(H/100,4)+')² = '+n(b,2)+' kg/m²</div>';
+  s+='<p><b>2. Lean body weight</b>: '+fm.name+'</p><div class="f">LBW = '+fm.male+'\nW = '+tr(W,3)+' kg, H = '+tr(H,2)+' cm\nresult = '+n(L.raw,2)+' kg</div>';
   if(L.implausible)s+='<p>This is under 25% of total weight ('+n(0.25*W,2)+' kg), so it is <b style="color:var(--ert)">implausible</b>. The value is shown but should not be relied on.</p>';
-  else s+='<p>Lean weight is never shown above total weight or below zero. <b>Shown: '+n(L.value,2)+' kg ('+n(fl(L.value,1))+' kg rounded down).</b></p>';
+  else s+='<p>Lean weight is never shown above total weight or below zero'+(L.capped?' (here it was cut back to total weight)':'')+'. <b>Shown: '+n(L.value,2)+' kg ('+n(fl(L.value,1))+' kg rounded down).</b></p>';
   s+='<p><b>3. Peters extracellular fluid volume</b></p><div class="f">ECV = 0.0215 × W^0.6469 × H^0.7236\n    = 0.0215 × '+n(Math.pow(W,0.6469),3)+' × '+n(Math.pow(H,0.7236),3)+' = '+n(ecv,3)+' L\nPeters LBW = 3.8 × ECV = '+n(3.8*ecv,2)+' kg</div>';
   if(i.age>0&&i.age<=20){var r=A.paediatric(CEN,{w:W,hcm:H,age:i.age,male:male});
-    s+='<p><b>4. RCPCH centiles</b></p><div class="f">'+(r.ok?'Age '+n(r.age,2)+' y, '+(male?'boy':'girl')+'\n0.4th = '+n(r.cc.c04,2)+', 2nd = '+n(r.cc.c2,2)+', 9th = '+n(r.cc.c9,2)+', 25th = '+n(r.cc.c25,2)+', 50th = '+n(r.cc.c50,2)+'\n75th = '+n(r.cc.c75,2)+', 91st = '+n(r.cc.c91,2)+', 98th = '+n(r.cc.c98,2)+', 99.6th = '+n(r.cc.c996,2)+' kg/m²\nBMI '+n(b,2)+' is '+r.band+'\nNearest line: '+r.nearest.name+' ('+n(r.nearest.value,2)+'), difference '+(r.nearest.diff>=0?'+':'')+n(r.nearest.diff,2):esc(r.reason))+'</div>'+(r.ok?'<p class="mu">Each line is interpolated linearly between the RCPCH reference points at the child\'s age.</p>':'')}
+    s+='<p><b>4. RCPCH centiles</b></p><div class="f">'+(r.ok?'Age '+n(r.age,3)+' y, '+(male?'boy':'girl')+'\n0.4th = '+n(r.cc.c04,2)+', 2nd = '+n(r.cc.c2,2)+', 9th = '+n(r.cc.c9,2)+', 25th = '+n(r.cc.c25,2)+', 50th = '+n(r.cc.c50,2)+'\n75th = '+n(r.cc.c75,2)+', 91st = '+n(r.cc.c91,2)+', 98th = '+n(r.cc.c98,2)+', 99.6th = '+n(r.cc.c996,2)+' kg/m²\nBMI '+n(b,2)+' kg/m² is '+r.band+'\nNearest line: '+r.nearest.name+' ('+n(r.nearest.value,2)+'), difference '+(r.nearest.diff>=0?'+':'')+n(r.nearest.diff,2):esc(r.reason))+'</div>'+(r.ok?'<p class="mu">Each line is interpolated linearly between the RCPCH reference points at the child\'s age.</p>':'')}
   $("wkb").innerHTML=s;$("wkb").className="";
 }
 
 function summary(){
   if(!last||!last.ready)return"";
-  var i=last.i,b=A.bmi(i.w,i.hcm),L=A.lbw(last.fid,i.w,i.hcm,i.male),t="KIDBMI SUMMARY\n"+(i.male?"Male":"Female")+", weight "+i.w+" kg, height "+i.hcm+" cm"+", age "+fl(i.age,1)+" y"+"\nBMI "+n(fl(b,1))+" kg/m²\nLean body weight "+n(fl(L.value,1))+" kg ("+nameOf(L.formula)+(L.implausible?", IMPLAUSIBLE":"")+")\nPeters ECV "+n(A.petersECV(i.w,i.hcm),2)+" L";
-  if(i.age>0&&i.age<=20){var r=A.paediatric(CEN,{w:i.w,hcm:i.hcm,age:i.age,male:i.male});if(r.ok)t+="\nRCPCH: BMI "+n(fl(r.bmi,1))+" is "+r.band+" (0.4th "+n(fl(r.cc.c04,1))+", 2nd "+n(fl(r.cc.c2,1))+", 50th "+n(fl(r.cc.c50,1))+", 91st "+n(fl(r.cc.c91,1))+", 98th "+n(fl(r.cc.c98,1))+", 99.6th "+n(fl(r.cc.c996,1))+"); nearest line "+r.nearest.name}
+  var i=last.i,b=A.bmi(i.w,i.hcm),L=A.lbw(i.w,i.hcm),t="KIDBMI SUMMARY\n"+(i.male?"Male":"Female")+", weight "+i.w+" kg, height "+i.hcm+" cm"+", age "+fl(i.age,1)+" y"+"\nBMI "+n(A.rd(b,1))+" kg/m²\nLean body weight "+n(fl(L.value,1))+" kg ("+'Peters'+(L.implausible?", IMPLAUSIBLE":"")+")\nPeters ECV "+n(A.petersECV(i.w,i.hcm),2)+" L";
+  if(i.age>0&&i.age<=20){var r=A.paediatric(CEN,{w:i.w,hcm:i.hcm,age:i.age,male:i.male});if(r.ok)t+="\nRCPCH: BMI "+n(A.rd(r.bmi,1))+" is "+r.band+" (0.4th "+n(A.rd(r.cc.c04,1))+", 2nd "+n(A.rd(r.cc.c2,1))+", 50th "+n(A.rd(r.cc.c50,1))+", 91st "+n(A.rd(r.cc.c91,1))+", 98th "+n(A.rd(r.cc.c98,1))+", 99.6th "+n(A.rd(r.cc.c996,1))+"); nearest line "+r.nearest.name}
   return t+"\nKidBMI v"+VERSION+". Decision support only."}
 
-["w","h","age"].forEach(function(id){$(id).addEventListener("input",render)});
-$("ageu").addEventListener("change",render);
+["w","h","agey","agem","aged"].forEach(function(id){$(id).addEventListener("input",render)});
 Array.prototype.forEach.call(document.querySelectorAll("input[name=s]"),function(e){e.addEventListener("change",render)});
 $("theme").addEventListener("click",function(){var dark=document.documentElement.getAttribute("data-theme")?document.documentElement.getAttribute("data-theme")==="dark":matchMedia("(prefers-color-scheme:dark)").matches;prefs.theme=dark?"light":"dark";save();applyTheme()});
-$("reset").addEventListener("click",function(){["w","h","age"].forEach(function(id){$(id).value=""});$("ageu").value="y";render();$("w").focus()});
+$("reset").addEventListener("click",function(){["w","h","agey","agem","aged"].forEach(function(id){$(id).value=""});render();$("w").focus()});
 $("copy").addEventListener("click",function(){var t=summary(),b=$("copy");if(!t){b.textContent="Nothing to copy yet";setTimeout(function(){b.textContent="Copy summary"},1500);return}
   var ok=function(){b.textContent="Copied";setTimeout(function(){b.textContent="Copy summary"},1500)};
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,function(){fb(t,ok)});else fb(t,ok)});
 function fb(t,ok){var a=document.createElement("textarea");a.value=t;a.style.position="fixed";a.style.opacity="0";document.body.appendChild(a);a.select();try{document.execCommand("copy");ok()}catch(e){}document.body.removeChild(a)}
+
+
+/* Tap the chart to enlarge it (scroll to pan); Close, Escape or a tap outside the chart returns. */
+function zoomOpen(){var z=$("zoom");$("zin").innerHTML=$("chartw").innerHTML;[].forEach.call($("zin").querySelectorAll("[id]"),function(e){e.removeAttribute("id")});$("zin").firstChild.style.width="100%";z.classList.add("on");z.scrollTop=0;$("zx").focus()}
+function zoomClose(){$("zoom").classList.remove("on");$("zin").innerHTML="";$("chartw").focus()}
+$("chartw").addEventListener("click",zoomOpen);
+$("chartw").addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();zoomOpen()}});
+$("zx").addEventListener("click",zoomClose);
+$("zoom").addEventListener("click",function(e){if(e.target===$("zoom"))zoomClose()});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&$("zoom").classList.contains("on"))zoomClose()});
 
 /* Print: one A4 page. printPrep fills the patient line and opens the working panels; the page's print stylesheet compacts the rest.
    On Android (Capacitor) the native PrintPlugin is called, as in Admix. */
@@ -263,11 +265,15 @@ function printPrep(){
   $("pd").textContent="KidBMI summary \u00b7 printed "+new Date().toLocaleString("en-GB")+" \u00b7 "+(i.male?"Male":"Female")+", "+i.w+" kg, "+i.hcm+" cm, age "+n(fl(i.age,1))+" y \u00b7 KidBMI v"+VERSION;
   [].forEach.call(document.querySelectorAll("#wkc details"),function(d){if(!d.open){d.open=true;opened.push(d)}})}
 window.addEventListener("beforeprint",function(){if(last&&last.ready)printPrep()});
-window.addEventListener("afterprint",function(){opened.forEach(function(d){d.open=false});opened=[]});
+function restoreOpened(){opened.forEach(function(d){d.open=false});opened=[]}
+window.addEventListener("afterprint",restoreOpened);
+/* Android: no "afterprint" event, so close the panels again when the app comes back after the print screen (or after 60 s). */
+var nativePrint=false;
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&nativePrint){nativePrint=false;restoreOpened()}});
 function printPage(){
   if(!last||!last.ready){alert("Enter weight, height and age first, then print.");return}
   var C=window.Capacitor,P=C&&C.Plugins&&C.Plugins.PrintPlugin,nat=C&&C.isNativePlatform&&C.isNativePlatform();
-  if(nat){if(!P){alert("Printing needs the PrintPlugin added to the Android app.");return}try{window.dispatchEvent(new Event("beforeprint"))}catch(e){}P.print({name:"KidBMI summary"}).catch(function(e){alert("Could not open the print dialog: "+(e&&e.message||e))});return}
+  if(nat){if(!P){alert("Printing needs the PrintPlugin added to the Android app.");return}try{window.dispatchEvent(new Event("beforeprint"))}catch(e){}nativePrint=true;setTimeout(function(){if(nativePrint){nativePrint=false;restoreOpened()}},60000);P.print({name:"KidBMI summary"}).catch(function(e){nativePrint=false;restoreOpened();alert("Could not open the print dialog: "+(e&&e.message||e))});return}
   try{window.print()}catch(e){alert("Printing is not available here. Use your browser menu to print or save as PDF.")}}
 window.printPage=printPage;
 render();

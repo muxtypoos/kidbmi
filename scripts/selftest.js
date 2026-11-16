@@ -39,7 +39,8 @@ const LINEDEFS = [["c04", "0.4th"], ["c2", "2nd"], ["c9", "9th"], ["c25", "25th"
 
 /* ---------- what the screen does with typed values ---------- */
 const typed = (s) => { const v = parseFloat(s); return v > 0 ? v : 0; };
-const f1 = (v) => E.fl(v, 1).toFixed(1);
+const f1 = (v) => E.fl(v, 1).toFixed(1); /* lean weight: rounded down */
+const n1 = (v) => E.rd(v, 1).toFixed(1); /* BMI and centiles: rounded to nearest */
 const r2 = (v) => (Math.round(v * 100) / 100).toFixed(2);
 
 const HEAD = ["group", "row", "sex", "age_years", "weight_kg", "height_cm", "status",
@@ -59,9 +60,9 @@ function row(group, n, sex, ageS, wS, hS) {
   o.status = c.messages.length ? "WARNING: " + c.messages.join(" ") : "OK";
 
   /* the app */
-  const bmi = E.bmi(w, hcm), L = E.lbw("peters", w, hcm, male), ecv = E.petersECV(w, hcm);
+  const bmi = E.bmi(w, hcm), L = E.lbw(w, hcm), ecv = E.petersECV(w, hcm);
   const P = E.paediatric(CEN, { w, hcm, age, male });
-  o.BMI = r2(bmi); o.BMI_shown_in_app = f1(bmi);
+  o.BMI = r2(bmi); o.BMI_shown_in_app = n1(bmi);
   o.Peters_ECV_litres = r2(ecv); o.Peters_LBW_kg = r2(L.value); o.LBW_shown_in_app_kg = f1(L.value);
   o.LBW_percent_of_weight = r2(100 * L.value / w);
   o.LBW_flag = L.implausible ? "IMPLAUSIBLE (under 25% of weight)" : L.capped ? "capped at total weight" : "";

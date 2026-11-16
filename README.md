@@ -1,14 +1,14 @@
 # KidBMI
 
-Standalone calculator for children: BMI, lean body weight and extracellular fluid volume by the Peters formula, and RCPCH paediatric BMI centiles (ages 2 to 20), including underweight.
+Standalone calculator for children: BMI, lean body weight and extracellular fluid volume by the Peters formula, and RCPCH paediatric BMI centiles (ages 2 to 20), including underweight. Age is entered as years, months and days, because the centiles change through the year.
 
 - `src/engine.js`: all equations and rules. No screen code, no global state; audit and test it on its own.
 - `src/template.html`: the UI. It only reads inputs, calls `KidBMI.*` and displays results.
 - `src/data/rcpch-bmi-centiles.json`: the nine RCPCH BMI centile lines, 0.4th to 99.6th (source and licence note in `src/data/README.md`).
 - `scripts/build.js`: inlines engine and data into one offline file, `dist/index.html` (usable as a Capacitor web dir).
-- `tests/engine.js`: hand-checked worked examples. `tests/equivalence.js`: compares against the Admix engine (set `ADMIX_ENGINE=/path/to/admix/src/engine.js`).
+- `tests/engine.js`: hand-checked worked examples. `tests/equivalence.js`: compares against the Admix engine (set `ADMIX_ENGINE=/path/to/admix/src/engine.js`). `tests/ui.js`: types values into the built page in a headless browser (needs Playwright; `CHROME=/path/to/chrome` if Chrome is not at /usr/bin/google-chrome).
 
-`npm test` runs both test files and the build. Decision support only; it does not replace clinical judgement or local policy.
+`npm test` runs the engine tests, the Admix comparison, the self-test check, the build and the screen tests. The Admix comparison and the screen tests print a loud banner when they are skipped (no Admix copy or no Playwright); `npm run test:full` fails instead of skipping. Decision support only; it does not replace clinical judgement or local policy.
 
 ## Run it
 Open `index.html`, or run `npm run build` and open `dist/index.html`. No network needed.
@@ -22,6 +22,18 @@ Open `selftest.csv` in any spreadsheet. Every row is one calculation: the inputs
 - **grid:** every combination of steadily rising ages, heights and weights, including impossible ones, to show how they are flagged.
 - **extremes:** tiny and huge values, zero, missing, negative, wrong units, and the edges at 2, 4 and 20 years and at the weight/height limits.
 
-Columns ending `_shown_in_app` are exactly what the screen displays (rounded down to 0.1). Regenerate with `npm run selftest`; `npm test` fails if the file is out of date or any row disagrees.
+Columns ending `_shown_in_app` are exactly what the screen displays (BMI to the nearest 0.1, lean weight rounded down to 0.1). Regenerate with `npm run selftest`; `npm test` fails if the file is out of date or any row disagrees.
 
 Printing: the Print button calls window.print() in a browser. In the Capacitor Android app it calls the native `PrintPlugin` (the same plugin Admix uses), so that plugin must be in the Android project.
+
+## Rounding
+BMI and centile values are rounded to the nearest 0.1. Lean body weight and displayed ages are rounded **down** (so lean weight is never overstated, and a child is not aged up). Total weight is shown as entered.
+
+## Limits of the self-test
+`selftest.csv` re-calculates Peters (with logarithms) and the centile interpolation a second way, but it reads the same centile data file as the app, so it catches calculation and rounding errors, not a wrong value in the source data. The source values are checked separately in `tests/engine.js` against figures read from the RCPCH file.
+
+## Licence and third-party material (not yet settled)
+No licence has been chosen for this repository, so by default all rights are reserved. Before calling it open source, settle:
+- The centile data comes from the RCPCH digital-growth-charts-server repository, which is under AGPL-3.0 (see `src/data/README.md`).
+- The two RCPCH BMI chart images in `src/assets/` carry an RCPCH copyright notice (c) 2013. Their permitted use here has not been confirmed with the RCPCH.
+- Whether the app counts as a medical device (MHRA) is undecided. It states bands and cautions, not just numbers.
