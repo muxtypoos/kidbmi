@@ -12,3 +12,4 @@
 - Ruler: triangle marker, thinner bar, smaller tags on two alternating rows so they cannot overlap, and labels kept inside the picture. Smaller BMI text.
 - Ruler: the nine centile notches are equally spaced (position between two notches is interpolated by BMI), with extra space at both ends. The Male button is blue when selected. "Peters formula" removed from the total body weight box. Stale comments and wording corrected.
 - Print button (header and bottom): compacts the results, ruler, RCPCH chart and working onto one A4 page, with a patient line and date. In the Android app it calls the Capacitor PrintPlugin, as Admix does. Removed the sentence saying lean weight can differ by several kilograms.
+- Ruler: three low-end segments to mirror the three high-end ones (below 0.4th, 0.4th to 2nd, 2nd to 9th). The 2nd to 9th segment is a light blue marker only: the band text still says within the usual range from the 2nd centile.

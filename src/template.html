@@ -4,9 +4,9 @@
 <title>KidBMI: paediatric BMI, lean body weight and Peters</title>
 <meta name="color-scheme" content="light dark">
 <style>
-:root{--bg:#f4f6f8;--card:#fff;--tx:#14202b;--mu:#5d6b78;--bd:#dde3e9;--pr:#d6336c;--prt:#fff;--ok:#e6f6ec;--okt:#15693a;--wa:#fff4d6;--wat:#8a5a00;--er:#fde8e8;--ert:#a11d1d;--bar:#f9d6e5;--bar2:#d6336c;--l91:#b8860b;--l98:#c2570c;--l996:#a11d1d;--l2:#4f8fd1;--l04:#1f5fa8;--usual:#cfe3d4;--lowt:#1f5fa8;--pt:#ffd400;color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1519;--card:#18212a;--tx:#e8eef3;--mu:#97a5b2;--bd:#2b3743;--pr:#ff8fb8;--prt:#0f1519;--ok:#12301f;--okt:#6fd49a;--wa:#3a2e0b;--wat:#f2c35b;--er:#3a1414;--ert:#ff9d9d;--bar:#4a2236;--bar2:#ff8fb8;--l91:#e0b84a;--l98:#ff9a52;--l996:#ff8080;--l2:#6fa8e0;--l04:#4a86cf;--usual:#2f4a3a;--lowt:#7db7ff}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#0f1519;--card:#18212a;--tx:#e8eef3;--mu:#97a5b2;--bd:#2b3743;--pr:#ff8fb8;--prt:#0f1519;--ok:#12301f;--okt:#6fd49a;--wa:#3a2e0b;--wat:#f2c35b;--er:#3a1414;--ert:#ff9d9d;--bar:#4a2236;--bar2:#ff8fb8;--l91:#e0b84a;--l98:#ff9a52;--l996:#ff8080;--l2:#6fa8e0;--l04:#4a86cf;--usual:#2f4a3a;--lowt:#7db7ff}
+:root{--bg:#f4f6f8;--card:#fff;--tx:#14202b;--mu:#5d6b78;--bd:#dde3e9;--pr:#d6336c;--prt:#fff;--ok:#e6f6ec;--okt:#15693a;--wa:#fff4d6;--wat:#8a5a00;--er:#fde8e8;--ert:#a11d1d;--bar:#f9d6e5;--bar2:#d6336c;--l91:#b8860b;--l98:#c2570c;--l996:#a11d1d;--l2:#4f8fd1;--l9:#8fbbe6;--l04:#1f5fa8;--usual:#cfe3d4;--lowt:#1f5fa8;--pt:#ffd400;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f1519;--card:#18212a;--tx:#e8eef3;--mu:#97a5b2;--bd:#2b3743;--pr:#ff8fb8;--prt:#0f1519;--ok:#12301f;--okt:#6fd49a;--wa:#3a2e0b;--wat:#f2c35b;--er:#3a1414;--ert:#ff9d9d;--bar:#4a2236;--bar2:#ff8fb8;--l91:#e0b84a;--l98:#ff9a52;--l996:#ff8080;--l2:#6fa8e0;--l9:#9cc4ee;--l04:#4a86cf;--usual:#2f4a3a;--lowt:#7db7ff}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f1519;--card:#18212a;--tx:#e8eef3;--mu:#97a5b2;--bd:#2b3743;--pr:#ff8fb8;--prt:#0f1519;--ok:#12301f;--okt:#6fd49a;--wa:#3a2e0b;--wat:#f2c35b;--er:#3a1414;--ert:#ff9d9d;--bar:#4a2236;--bar2:#ff8fb8;--l91:#e0b84a;--l98:#ff9a52;--l996:#ff8080;--l2:#6fa8e0;--l9:#9cc4ee;--l04:#4a86cf;--usual:#2f4a3a;--lowt:#7db7ff}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
 header{background:linear-gradient(135deg,#d6336c,#f783ac);color:#fff;padding:max(12px,env(safe-area-inset-top)) 16px 12px;display:flex;align-items:center;gap:10px}
@@ -63,7 +63,7 @@ summary{cursor:pointer;font-weight:600;min-height:32px}
 .pd{display:none}
 @page{size:A4;margin:8mm}
 @media print{
-:root:root:root:root{color-scheme:light;--bg:#fff;--card:#fff;--tx:#000;--mu:#444;--bd:#bbb;--ok:#e6f6ec;--okt:#15693a;--wa:#fff4d6;--wat:#8a5a00;--er:#fde8e8;--ert:#a11d1d;--bar:#f9d6e5;--bar2:#d6336c;--l91:#b8860b;--l98:#c2570c;--l996:#a11d1d;--l2:#4f8fd1;--l04:#1f5fa8;--usual:#cfe3d4;--lowt:#1f5fa8;--pt:#ffd400}
+:root:root:root:root{color-scheme:light;--bg:#fff;--card:#fff;--tx:#000;--mu:#444;--bd:#bbb;--ok:#e6f6ec;--okt:#15693a;--wa:#fff4d6;--wat:#8a5a00;--er:#fde8e8;--ert:#a11d1d;--bar:#f9d6e5;--bar2:#d6336c;--l91:#b8860b;--l98:#c2570c;--l996:#a11d1d;--l2:#4f8fd1;--l9:#8fbbe6;--l04:#1f5fa8;--usual:#cfe3d4;--lowt:#1f5fa8;--pt:#ffd400}
 *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 html,body{background:#fff;font-size:11px;line-height:1.3}
 header,.noprint,#reset,#copy,#inp,#msgs:empty{display:none!important}
@@ -195,7 +195,7 @@ function ruler(r){
       pos=function(v){if(v<=V[0])return Math.max(-E,-(V[0]-v)/(V[1]-V[0]));if(v>=V[8])return Math.min(8+E,8+(v-V[8])/(V[8]-V[7]));
         for(var i=0;i<8;i++)if(v<=V[i+1])return i+(v-V[i])/(V[i+1]-V[i]);return 8},
       X=function(v){return XI(pos(v))},g="";
-  [[-E,0,"var(--l04)"],[0,1,"var(--l2)"],[1,6,"var(--usual)"],[6,7,"var(--l91)"],[7,8,"var(--l98)"],[8,8+E,"var(--l996)"]].forEach(function(s){
+  [[-E,0,"var(--l04)"],[0,1,"var(--l2)"],[1,2,"var(--l9)"],[2,6,"var(--usual)"],[6,7,"var(--l91)"],[7,8,"var(--l98)"],[8,8+E,"var(--l996)"]].forEach(function(s){
     g+='<rect x="'+XI(s[0])+'" y="'+y+'" width="'+(XI(s[1])-XI(s[0]))+'" height="'+hh+'" fill="'+s[2]+'"/>'});
   K.forEach(function(k,i){var x=XI(i),major=i!==2&&i!==3&&i!==5;
     g+='<line x1="'+x+'" x2="'+x+'" y1="'+(y-2)+'" y2="'+(y+hh+2)+'" stroke="var(--tx)" stroke-width="'+(major?1:.7)+'"'+(major?'':' opacity=".7"')+'/>'+
