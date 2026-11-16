@@ -1,6 +1,6 @@
 # KidBMI
 
-Standalone calculator for children: BMI, lean body weight (Janmahasatian, Boer, James, Hume, Peters), Peters extracellular fluid volume, and RCPCH paediatric BMI centiles (ages 2 to 20), including underweight.
+Standalone calculator for children: BMI, lean body weight and extracellular fluid volume by the Peters formula, and RCPCH paediatric BMI centiles (ages 2 to 20), including underweight.
 
 - `src/engine.js`: all equations and rules. No screen code, no global state; audit and test it on its own.
 - `src/template.html`: the UI. It only reads inputs, calls `KidBMI.*` and displays results.
@@ -13,7 +13,7 @@ Standalone calculator for children: BMI, lean body weight (Janmahasatian, Boer, 
 ## Run it
 Open `index.html`, or run `npm run build` and open `dist/index.html`. No network needed.
 
-Source of the formulas and centile data: Admix (https://github.com/muxtypoos/admix). Lean body weight: Peters AM et al., Br J Anaesth 2011;106:719-723.
+Origin: split out of Admix (https://github.com/muxtypoos/admix). Centile data: RCPCH reference data (see `src/data/README.md`). Lean body weight: Peters AM et al., Br J Anaesth 2011;106:719-723.
 
 ## Self-test file (`selftest.csv`)
 Open `selftest.csv` in any spreadsheet. Every row is one calculation: the inputs, what the app shows, and a second calculation made a different way (logarithms for Peters, separate centile interpolation) in the last columns. `check` says PASS when the two agree.
