@@ -32,8 +32,14 @@ BMI and centile values are rounded to the nearest 0.1. Lean body weight and disp
 ## Limits of the self-test
 `selftest.csv` re-calculates Peters (with logarithms) and the centile interpolation a second way, but it reads the same centile data file as the app, so it catches calculation and rounding errors, not a wrong value in the source data. The source values are checked separately in `tests/engine.js` against figures read from the RCPCH file.
 
-## Licence and third-party material (not yet settled)
-No licence has been chosen for this repository, so by default all rights are reserved. Before calling it open source, settle:
+## Licence
+
+© 2026 Dr George Lui. Free to use and share under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/): credit the author, no commercial use without permission, and share any adaptations under the same licence. See [`LICENSE`](LICENSE).
+
+Not covered (third-party, owners' own terms): RCPCH BMI centile data (src/data/rcpch-bmi-centiles.json), from rcpch/digital-growth-charts-server, AGPL-3.0; RCPCH BMI chart images (src/assets/), RCPCH copyright 2013.
+
+## Third-party material and open questions
+Still to settle:
 - The centile data comes from the RCPCH digital-growth-charts-server repository, which is under AGPL-3.0 (see `src/data/README.md`).
 - The two RCPCH BMI chart images in `src/assets/` carry an RCPCH copyright notice (c) 2013. Their permitted use here has not been confirmed with the RCPCH.
 - Whether the app counts as a medical device (MHRA) is undecided. It states bands and cautions, not just numbers.
